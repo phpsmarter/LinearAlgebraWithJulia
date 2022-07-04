@@ -4,7 +4,7 @@
 using Markdown
 using InteractiveUtils
 
-# ╔═╡ 7b8947b4-faa7-11ec-2e9a-757f48d4a4ca
+# ╔═╡ f802779e-fab0-11ec-2852-add639985750
 begin
         using PlutoUI, Plots,DataFrames,HypertextLiteral,LaTeXStrings,Symbolics,LinearAlgebra,RowEchelon
         gr()
@@ -14,57 +14,133 @@ begin
         PlutoUI.TableOfContents()
  end
 
-# ╔═╡ 57ee45d0-81c3-443f-ae1f-282947fbe577
+# ╔═╡ 034f5085-a8e7-4d51-b1d8-9b9cedc2c789
 PlutoUI.Resource("https://tva1.sinaimg.cn/thumbnail/e6c9d24egy1h2alsw1tzxj20m80gomxn.jpg")
 
 
-# ╔═╡ af0e5714-f190-4cda-94fd-c63791a32431
-md"# ch01 sec1.6 齐次线性方程组
+# ╔═╡ c9237a6e-e010-4961-93b5-066797135c37
+md"""
+
+# ch02 sec2.1 空间中的点和向量
 
 !!! outcomes
 
-    - A. 从方程的秩判断是否有非平凡解
-    - B. 求齐次线性方程组的基本解
-    - C. 理解方程组的一般解和齐次方程组的联系
+    - A. 理解$R^n$ 空间中的点,向量的几何和代数意义
+    - B. 找到$R^n$ 空间中的点的位置
+    - C. 判断两个向量是否相同
+"""
+
+# ╔═╡ bb98950e-5bdd-4e87-bca6-a968b390c557
+begin
+        store=Dict()
+    
+        function save(key::String, dict)
+            store[key]=dict
+        end
+        
+        function read(key::String)
+            return  store[key]
+        end
+
+		unzip(a) = zip(a...) 
+    end
 
 
-齐次线性方程组是比较特别的方程组, 因为它的常数项都为$0$
-
-
-
-!!! definition
-    齐次线性方程组的一般形式:
-
-    $\left\{ 
-	\begin{array}{c}
-	a_{11}x_1+a_{12}x_2+\cdots+a_{1n}x_n=0 \\ 
-	a_{21}x_1+a_{22}x_2+\cdots+a_{2n}x_n=0 \\ 
-    \vdots \\
-	a_{m1}x_1+a_{m2}x_2+\cdots+a_{mn}x_n=0 \\
-	\end{array}
-	\right.$
-
-
-齐次线性方程组总是有解, $x_1,x_2,\cdots,x_n$ 都等于$0$ 时,满足方程组,这个解称为平凡解(trivial solution)
-
-如果齐次线性方程组的解中至少有一个变量值不等于$0$,这个解就称为非平凡解(non-trivial solution)
-"
-
-# ╔═╡ 2bdb8416-2b3e-4cd4-b16c-473f8ca6c249
+# ╔═╡ 0634a72e-7492-40e0-ac1e-de706ae49ce0
 md"""
-!!! theorem 
-    齐次线性方程组的解与秩的关系
+在中学数学中我们已经学习过了直角坐标系的内容 ,一个有序的数组例如 $(2,3)$,或者 $(2,3,4)$,都可以标注在坐标系上. 坐标上的点可以通用表示为$(x,y,z)$,这和我们在第一章看到的线性方程组的变量解集形式一样. 两种形式的相似可以作为一个切入点, 看看能不能有更多的联系. 
 
-    如果齐次线性方程组有$m$ 个方程, $n$ 个未知数,  系数矩阵的$rank=r$ 那么有:
+ $(store["plot1"])
 
-    - 1.如果 $r=n$ 则齐次方程组只有平凡解
-    - 2.如果$n<r$ 则齐次方程组有无限组解
+当 数组$(2,3,4,5)$ 里的有序元素数量大于$3$ 时, 无法可视化, 但是我们任然可以想象出一个有四个坐标轴的坐标系, 数组$(2,3,4,5)$ 在想象的有四个坐标轴的坐标系中的行为和 $(2,3,4)$ 在三维坐标系中的行为是一样的. 
+
+这个想法还可以继续延伸, 一个$n$ 维的数组, 可以用$n$ 维的坐标系表示, 这个坐标系有 $n$ 个轴.
+
+一组有$n$ 个数字组成的有序数组和有$n$ 条坐标轴的中的点是一一对应的, 这实际是一种函数映射关系. 
+
+"""
+
+# ╔═╡ 31ac6e4b-f6bd-408b-a9b1-dda7d9475e5c
+let
+	p,q=(2,1),(-3,4)
+	ann=[
+		(2,1.3,text(L"P=(2,1)",pointsize=12,color=:green)),
+		(-3,3.8,text(L"Q=(-3,4)",pointsize=12,color=:green))
+	]
+	p1=scatter([p[1],q[1]],[p[2],q[2]], ms=6,frame=:origin,label=false,ann=ann,xlims=(-4,3),size=(360,360))
+	save("plot1",p1)
+	
+end
+
+# ╔═╡ 72d83fac-83aa-4828-9ad5-026965ce956e
+md"""
+## $n$ 维空间中的向量
+
+空间中的向量和坐标系中的点不同, 坐标系中的点由一组数字来度量, 空间中的向量度量的是大小和方向. 
+
+也就是说当向量的方向和大小相同时,两个向量代表同一个向量
+
+ $(store["quiver"])
+
+ 上面图中六个向量,在绘图时,使用 Plots.jl 软件包. 
+
+```julia
+quiver([1,2],[1,1],quiver=([1,1],[1,1]))
+```
+
+`[1,2],[1,1]` 代表向量启示的坐标, `[1,1],[1,1]`, 代表两个向量在$x,y$ 方向上的增量. 可以看到增量一样,如果用勾股定理可以得到几个向量和水平方向的夹角相同, 斜边长度也相同. 
+
+
+这里的向量是物理意义上的向量, 要知道箭尾的坐标和到达箭头的增量信息. 
+
 
 
 """
 
-# ╔═╡ 4635060a-cab9-4780-9fc5-63772435ed7a
+# ╔═╡ 90cd69ef-229a-4588-b068-5903fb752a6b
+let
+	
+	
+	quiver([1,2,3,2,1,3],[1,1,3,3,3,1],quiver=([1,1,1,1,1,1],[1,1,1,1,1,1]),size=(360,360))
+	vector=plot!([3,4,4],[1,1,2],label=false,ls=:dash, lw=1, color=:red)
+	save("quiver",vector)
 
+
+end
+
+# ╔═╡ 29119d71-40a8-4aa9-bd15-c66827ae72bd
+md"""
+## 坐标系里的点和物理意义向量之间的联系
+
+描述物理意义的向量需要知道箭尾信息和达到箭头的变化信息. 对于坐标系里的点通过简单的变换,就可以描述为物理意义的向量. 当坐标系里所有向量的尾部都选在$0$ 点. 例如在三维坐标系中, $\begin{bmatrix}0\\ 0\\0 \end{bmatrix}$ 点作为所有向量的尾巴, 三维空间中点的坐标表示为从$0$ 点开始的变化信息,例如$\begin{bmatrix}1\\ 1\\1 \end{bmatrix}$ 三个数字就表示在三个坐标轴方向上的变化情况. 
+
+ $(store["plot2"])
+
+上图就描述两个点与向量之间的的关系, 都从$\begin{bmatrix}0\\0\end{bmatrix}$ 点出发, 指向不同的位置.由于坐标系中向量都有这个属性, 所以在描述的时候省略从$0$ 点出发这个声明. 
+
+另外一个需要注意的点是: 由于坐标系中坐标轴的单位可以变化, 当我们把空间一个点映射到不同单位坐标下, 表示方法不同, 但是代表的是同一个点. 这个问题会在基变换中提到. 基变换是线性代数中非常复杂的问题, 可以看到在定义的时候就已经有迹可循.  
+
+现在坐标系中的点可以用坐标表示位置,表示向量, 合并起来就成为**坐标向量**
+
+后面在坐标系中描述向量的时候都默认使用点的坐标表示向量, 省略从原点出发这一信息. 
+
+**注:在绘制向量的箭头时, 你无法省略出发点的坐标, 否则计算机也不知道坐标的意义**
+
+
+"""
+
+# ╔═╡ 9d9813eb-6262-4d04-8d64-7084c9dcd1b7
+let
+	p,q=(2,1),(-3,4)
+	ann=[
+		(2,1.3,text(L"P=(2,1)",pointsize=12,color=:green)),
+		(-3,3.8,text(L"Q=(-3,4)",pointsize=12,color=:green))
+	]
+	p1=plot([0,q[1]],[0,q[2]], arrow=true,frame=:origin,label=false,ann=ann,xlims=(-4,3),size=(360,360))
+	p2=plot!([0,p[1]],[0,p[2]], arrow=true,frame=:origin,label=false,ann=ann,xlims=(-4,3),size=(360,360))
+	save("plot2",p2)
+	
+end
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
@@ -274,10 +350,9 @@ uuid = "187b0558-2788-49d3-abe0-74a17ed4e7c9"
 version = "1.3.1"
 
 [[deps.Contour]]
-deps = ["StaticArrays"]
-git-tree-sha1 = "9f02045d934dc030edad45944ea80dbd1f0ebea7"
+git-tree-sha1 = "ebf46a97de8a7a95e683a9d9e16bea1bb693b5ff"
 uuid = "d38c429a-6771-53c6-b99e-75d170b6e991"
-version = "0.5.7"
+version = "0.6.0"
 
 [[deps.Crayons]]
 git-tree-sha1 = "249fe38abf76d48563e2f4556bebd215aa317e15"
@@ -343,9 +418,9 @@ uuid = "8ba89e20-285c-5b6f-9357-94700520ee1b"
 
 [[deps.Distributions]]
 deps = ["ChainRulesCore", "DensityInterface", "FillArrays", "LinearAlgebra", "PDMats", "Printf", "QuadGK", "Random", "SparseArrays", "SpecialFunctions", "Statistics", "StatsBase", "StatsFuns", "Test"]
-git-tree-sha1 = "0597dffe1268516192ff4ddebdb4d8937254512d"
+git-tree-sha1 = "d530092b57aef8b96b27694e51c575b09c7f0b2e"
 uuid = "31c24e10-a181-5473-b8eb-7969acd0382f"
-version = "0.25.63"
+version = "0.25.64"
 
 [[deps.DocStringExtensions]]
 deps = ["LibGit2"]
@@ -751,10 +826,10 @@ deps = ["Base64"]
 uuid = "d6f4376e-aef5-505a-96c1-9c027394607a"
 
 [[deps.MbedTLS]]
-deps = ["Dates", "MbedTLS_jll", "Random", "Sockets"]
-git-tree-sha1 = "1c38e51c3d08ef2278062ebceade0e46cefc96fe"
+deps = ["Dates", "MbedTLS_jll", "MozillaCACerts_jll", "Random", "Sockets"]
+git-tree-sha1 = "891d3b4e8f8415f53108b4918d0183e61e18015b"
 uuid = "739be429-bea8-5141-9913-cc70e7f3736d"
-version = "1.0.3"
+version = "1.1.0"
 
 [[deps.MbedTLS_jll]]
 deps = ["Artifacts", "Libdl"]
@@ -1462,10 +1537,15 @@ version = "0.9.1+5"
 """
 
 # ╔═╡ Cell order:
-# ╟─57ee45d0-81c3-443f-ae1f-282947fbe577
-# ╟─7b8947b4-faa7-11ec-2e9a-757f48d4a4ca
-# ╠═af0e5714-f190-4cda-94fd-c63791a32431
-# ╠═2bdb8416-2b3e-4cd4-b16c-473f8ca6c249
-# ╠═4635060a-cab9-4780-9fc5-63772435ed7a
+# ╠═034f5085-a8e7-4d51-b1d8-9b9cedc2c789
+# ╠═f802779e-fab0-11ec-2852-add639985750
+# ╠═c9237a6e-e010-4961-93b5-066797135c37
+# ╠═0634a72e-7492-40e0-ac1e-de706ae49ce0
+# ╠═31ac6e4b-f6bd-408b-a9b1-dda7d9475e5c
+# ╠═72d83fac-83aa-4828-9ad5-026965ce956e
+# ╠═90cd69ef-229a-4588-b068-5903fb752a6b
+# ╠═29119d71-40a8-4aa9-bd15-c66827ae72bd
+# ╠═9d9813eb-6262-4d04-8d64-7084c9dcd1b7
+# ╠═bb98950e-5bdd-4e87-bca6-a968b390c557
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
