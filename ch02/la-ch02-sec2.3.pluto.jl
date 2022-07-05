@@ -4,7 +4,7 @@
 using Markdown
 using InteractiveUtils
 
-# ╔═╡ f802779e-fab0-11ec-2852-add639985750
+# ╔═╡ b2d819ce-fb6b-11ec-12d9-ad077cde4dda
 begin
         using PlutoUI, Plots,DataFrames,HypertextLiteral,LaTeXStrings,Symbolics,LinearAlgebra,RowEchelon
         gr()
@@ -14,23 +14,59 @@ begin
         PlutoUI.TableOfContents()
  end
 
-# ╔═╡ 034f5085-a8e7-4d51-b1d8-9b9cedc2c789
+# ╔═╡ e4ad6f58-94d0-4f67-8dbe-da590602b65f
 PlutoUI.Resource("https://tva1.sinaimg.cn/thumbnail/e6c9d24egy1h2alsw1tzxj20m80gomxn.jpg")
 
 
-# ╔═╡ c9237a6e-e010-4961-93b5-066797135c37
-md"""
-
-# ch02 sec2.1 空间中的点和向量
-
+# ╔═╡ 7f3446ce-f2a8-4243-9af3-bbe374c972dc
+md"# ch02 sec2.3  向量标量乘法
 !!! outcomes
 
-    - A. 理解$R^n$ 空间中的点,向量的几何和代数意义
-    - B. 找到$R^n$ 空间中的点的位置
-    - C. 判断两个向量是否相同
+    - A. 向量标量乘法
+    - B. 用标量乘法证明向量表达式等价
+"
+
+# ╔═╡ 3650da4d-4af9-48e3-9623-e9d91504f89a
+	md"""
+当向量表示为坐标向量形式.如:$u=\begin{bmatrix}u_1\\u_2 \\ \vdots \\ u_n \end{bmatrix}$
+标量乘法可以可以定义为:
+
+!!! definition
+    $ku=k\begin{bmatrix}u_1\\u_2 \\ \vdots \\ u_n \end{bmatrix}=\begin{bmatrix}ku_1\\ku_2 \\ \vdots \\ ku_n \end{bmatrix}$
+
+坐标向量的每个元素都缩放$k$ 倍
+向量表示为 $\begin{bmatrix}2\\1\end{bmatrix}$,时各种$k$ 取值时的新坐标向量图像
+
 """
 
-# ╔═╡ bb98950e-5bdd-4e87-bca6-a968b390c557
+# ╔═╡ 91045e4e-56f0-41f0-83e5-e5039ebb7250
+md"""
+## 向量标量乘法的性质:
+
+!!! definition
+
+    向量标量乘法的性质:
+
+    定义两个向量$u,v$, 和标量$k,l \in R$
+    - 分配率1:
+
+      $k(u+v)=ku+kv$
+
+    -  分配率2:
+
+      $(k+l)u=ku+lu$
+
+    -  结合律:
+
+      $k(lu)=(kl)u$
+    
+    -  向量乘以 1, 等于自身:
+
+      $1u=u$
+    
+"""
+
+# ╔═╡ 16b0c52a-d050-4da5-b127-d55590ee5391
 begin
         store=Dict()
     
@@ -41,105 +77,36 @@ begin
         function read(key::String)
             return  store[key]
         end
-
-		unzip(a) = zip(a...) 
-    end
-
-
-# ╔═╡ 0634a72e-7492-40e0-ac1e-de706ae49ce0
-md"""
-在中学数学中我们已经学习过了直角坐标系的内容 ,一个有序的数组例如 $(2,3)$,或者 $(2,3,4)$,都可以标注在坐标系上. 坐标上的点可以通用表示为$(x,y,z)$,这和我们在第一章看到的线性方程组的变量解集形式一样. 两种形式的相似可以作为一个切入点, 看看能不能有更多的联系. 
-
- $(store["plot1"])
-
-当 数组$(2,3,4,5)$ 里的有序元素数量大于$3$ 时, 无法可视化, 但是我们任然可以想象出一个有四个坐标轴的坐标系, 数组$(2,3,4,5)$ 在想象的有四个坐标轴的坐标系中的行为和 $(2,3,4)$ 在三维坐标系中的行为是一样的. 
-
-这个想法还可以继续延伸, 一个$n$ 维的数组, 可以用$n$ 维的坐标系表示, 这个坐标系有 $n$ 个轴.
-
-一组有$n$ 个数字组成的有序数组和有$n$ 条坐标轴的中的点是一一对应的, 这实际是一种函数映射关系. 
-
-"""
-
-# ╔═╡ 31ac6e4b-f6bd-408b-a9b1-dda7d9475e5c
-let
-	p,q=(2,1),(-3,4)
-	ann=[
-		(2,1.3,text(L"P=(2,1)",pointsize=12,color=:green)),
-		(-3,3.8,text(L"Q=(-3,4)",pointsize=12,color=:green))
-	]
-	p1=scatter([p[1],q[1]],[p[2],q[2]], ms=6,frame=:origin,label=false,ann=ann,xlims=(-4,3),size=(360,360))
-	save("plot1",p1)
 	
-end
 
-# ╔═╡ 72d83fac-83aa-4828-9ad5-026965ce956e
-md"""
-## $n$ 维空间中的向量
+	    function vec_plot(v1,v2,k,ls=:solid)
+			v11,v12=v1[1],v1[2]
+			v21,v22=v2[1],v2[2]
+			return plot([v11,v21],[v12,v22],label=L"%$(k)u", arrow=true, lw=2,ls=ls,frame=:semi)
+		end
 
-空间中的向量和坐标系中的点不同, 坐标系中的点由一组数字来度量, 空间中的向量度量的是大小和方向. 
-
-也就是说当向量的方向和大小相同时,两个向量代表同一个向量
-
- $(store["quiver"])
-
- 上面图中六个向量,在绘图时,使用 Plots.jl 软件包. 
-
-```julia
-quiver([1,2],[1,1],quiver=([1,1],[1,1]))
-```
-
-`[1,2],[1,1]` 代表向量启示的坐标, `[1,1],[1,1]`, 代表两个向量在$x,y$ 方向上的增量. 可以看到增量一样,如果用勾股定理可以得到几个向量和水平方向的夹角相同, 斜边长度也相同. 
-
-
-这里的向量是物理意义上的向量, 要知道箭尾的坐标和到达箭头的增量信息. 
-
-
-
-"""
-
-# ╔═╡ 90cd69ef-229a-4588-b068-5903fb752a6b
-let
-	
-	
-	quiver([1,2,3,2,1,3],[1,1,3,3,3,1],quiver=([1,1,1,1,1,1],[1,1,1,1,1,1]),size=(360,360))
-	vector=plot!([3,4,4],[1,1,2],label=false,ls=:dash, lw=1, color=:red)
-	save("quiver",vector)
-
+	    function vec_plot!(v1,v2,k,ls=:solid)
+			v11,v12=v1[1],v1[2]
+			v21,v22=v2[1],v2[2]
+			return plot!([v11,v21],[v12,v22],label=L"%$(k)u", arrow=true, lw=2,ls=ls,frame=:semi)
+		end
 
 end
 
-# ╔═╡ 29119d71-40a8-4aa9-bd15-c66827ae72bd
-md"""
-## 坐标系里的点和物理意义向量之间的联系
-
-描述物理意义的向量需要知道箭尾信息和达到箭头的变化信息. 对于坐标系里的点通过简单的变换,就可以描述为物理意义的向量. 当坐标系里所有向量的尾部都选在$0$ 点. 例如在三维坐标系中, $\begin{bmatrix}0\\ 0\\0 \end{bmatrix}$ 点作为所有向量的尾巴, 三维空间中点的坐标表示为从$0$ 点开始的变化信息,例如$\begin{bmatrix}1\\ 1\\1 \end{bmatrix}$ 三个数字就表示在三个坐标轴方向上的变化情况. 
-
- $(store["plot2"])
-
-上图就描述两个点与向量之间的的关系, 都从$\begin{bmatrix}0\\0\end{bmatrix}$ 点出发, 指向不同的位置.由于坐标系中向量都有这个属性, 所以在描述的时候省略从$0$ 点出发这个声明. 
-
-另外一个需要注意的点是: 由于坐标系中坐标轴的单位可以变化, 当我们把空间一个点映射到不同单位坐标下, 表示方法不同, 但是代表的是同一个点. 这个问题会在基变换中提到. 基变换是线性代数中非常复杂的问题, 可以看到在定义的时候就已经有迹可循.  
-
-现在坐标系中的点可以用坐标表示位置,表示向量, 合并起来就成为**坐标向量**
-
-后面在坐标系中描述向量的时候都默认使用点的坐标表示向量, 省略从原点出发这一信息. 
-
-**注:在绘制向量的箭头时, 你无法省略出发点的坐标, 否则计算机也不知道坐标的意义**
-
-
-"""
-
-# ╔═╡ 9d9813eb-6262-4d04-8d64-7084c9dcd1b7
+# ╔═╡ c436d107-a613-4dda-a956-1fceaabac677
 let
-	p,q=(2,1),(-3,4)
-	ann=[
-		(2,1.3,text(L"P=(2,1)",pointsize=12,color=:green)),
-		(-3,3.8,text(L"Q=(-3,4)",pointsize=12,color=:green))
-	]
-	p1=plot([0,q[1]],[0,q[2]], arrow=true,frame=:origin,label=false,ann=ann,xlims=(-4,3),size=(360,360))
-	p2=plot!([0,p[1]],[0,p[2]], arrow=true,frame=:origin,label=false,ann=ann,xlims=(-4,3),size=(360,360))
-	save("plot2",p2)
-	
+	zero,u=[0,0],[2,1]
+	kspan=-2:0.5:2
+	plotarr=[]
+	for (i,k) in enumerate(kspan)
+				
+				 p= vec_plot(zero,k*u,k)
+				 push!(plotarr,p)
+	 end
+
+	scalar=plot!(plotarr...,link=:both,layout=(3,3))
+	save("scalar",scalar)
+    
 end
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
@@ -1537,15 +1504,12 @@ version = "0.9.1+5"
 """
 
 # ╔═╡ Cell order:
-# ╟─034f5085-a8e7-4d51-b1d8-9b9cedc2c789
-# ╟─f802779e-fab0-11ec-2852-add639985750
-# ╠═c9237a6e-e010-4961-93b5-066797135c37
-# ╠═0634a72e-7492-40e0-ac1e-de706ae49ce0
-# ╠═31ac6e4b-f6bd-408b-a9b1-dda7d9475e5c
-# ╠═72d83fac-83aa-4828-9ad5-026965ce956e
-# ╠═90cd69ef-229a-4588-b068-5903fb752a6b
-# ╠═29119d71-40a8-4aa9-bd15-c66827ae72bd
-# ╠═9d9813eb-6262-4d04-8d64-7084c9dcd1b7
-# ╠═bb98950e-5bdd-4e87-bca6-a968b390c557
+# ╟─e4ad6f58-94d0-4f67-8dbe-da590602b65f
+# ╟─b2d819ce-fb6b-11ec-12d9-ad077cde4dda
+# ╟─7f3446ce-f2a8-4243-9af3-bbe374c972dc
+# ╟─3650da4d-4af9-48e3-9623-e9d91504f89a
+# ╠═c436d107-a613-4dda-a956-1fceaabac677
+# ╟─91045e4e-56f0-41f0-83e5-e5039ebb7250
+# ╠═16b0c52a-d050-4da5-b127-d55590ee5391
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
