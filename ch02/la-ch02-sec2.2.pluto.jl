@@ -4,7 +4,7 @@
 using Markdown
 using InteractiveUtils
 
-# ╔═╡ f802779e-fab0-11ec-2852-add639985750
+# ╔═╡ 18adba76-fb33-11ec-36a8-2f0cf36ab653
 begin
         using PlutoUI, Plots,DataFrames,HypertextLiteral,LaTeXStrings,Symbolics,LinearAlgebra,RowEchelon
         gr()
@@ -14,23 +14,66 @@ begin
         PlutoUI.TableOfContents()
  end
 
-# ╔═╡ 034f5085-a8e7-4d51-b1d8-9b9cedc2c789
+# ╔═╡ 40c13c25-31cb-493b-b5f7-60134fe3b37c
 PlutoUI.Resource("https://tva1.sinaimg.cn/thumbnail/e6c9d24egy1h2alsw1tzxj20m80gomxn.jpg")
 
 
-# ╔═╡ c9237a6e-e010-4961-93b5-066797135c37
-md"""
-
-# ch02 sec2.1 空间中的点和向量
+# ╔═╡ 44cf51da-0970-4033-b6f5-3441b750706c
+md"# ch02 sec2.2  向量的加法操作
 
 !!! outcomes
 
-    - A. 理解$R^n$ 空间中的点,向量的几何和代数意义
-    - B. 找到$R^n$ 空间中的点的位置
-    - C. 判断两个向量是否相同
+    - A 计算向量的和与差
+    - B 使用向量加法法则证明向量表达式等价
+"
+
+# ╔═╡ 4b0d8010-9240-4136-b789-365ead83c9c7
+md"""
+当两个向量表示为坐标向量形式.如:$u=\begin{bmatrix}u_1\\u_2 \\ \vdots \\ u_n \end{bmatrix}$
+和 $v=\begin{bmatrix}v_1\\v_2 \\ \vdots \\ v_n \end{bmatrix}$, 加法可以定义为:
+
+!!! definition
+    $u+v=\begin{bmatrix}u_1\\u_2 \\ \vdots \\ u_n \end{bmatrix}+\begin{bmatrix}v_1\\v_2 \\ \vdots \\ v_n \end{bmatrix}=\begin{bmatrix}u_1+v_1\\u_2+v_2 \\ \vdots \\ u_n+v_n \end{bmatrix}$
+
+两个向量的元素数量要相同, 执行加法时对位相加
+
 """
 
-# ╔═╡ bb98950e-5bdd-4e87-bca6-a968b390c557
+# ╔═╡ 3536a108-aa3f-46bc-9b55-347a7bbf769a
+u=[1 2 3 4]'
+
+# ╔═╡ ea0a42c8-25f1-4b96-b15c-99f7882c2a15
+v=[4 5 6 7]'
+
+# ╔═╡ fadb4e73-fa7f-451d-8345-8920ec405404
+sum=u+v
+
+# ╔═╡ 7920fee3-26ce-4e06-9b5f-7c8ee47eb242
+md"""
+## 向量加法的性质:
+
+!!! definition
+    向量加法属性:
+
+    1. 加法交换律:
+
+       $u+v=v+u$
+
+    2. 加法结合律:
+
+       $(u+v)+w=u+(v+w)$
+
+    3. 存在$0$ 向量使得:
+
+       $u+0=u$
+
+    4. 每个向量都有一个方向相反, 大小相同的向量使得:
+
+       $u+(-u)=0$
+      
+"""
+
+# ╔═╡ 7c9d9dce-bed0-45bc-b70c-09c7952c4350
 begin
         store=Dict()
     
@@ -41,104 +84,123 @@ begin
         function read(key::String)
             return  store[key]
         end
+	
 
-		unzip(a) = zip(a...) 
-    end
+	    function vec_plot(v1,v2,ls=:solid)
+			v11,v12=v1[1],v1[2]
+			v21,v22=v2[1],v2[2]
+			return plot([v11,v21],[v12,v22],label=false, arrow=true, lw=2,ls=ls)
+		end
+
+	    function vec_plot!(v1,v2,ls=:solid)
+			v11,v12=v1[1],v1[2]
+			v21,v22=v2[1],v2[2]
+			return plot!([v11,v21],[v12,v22],label=false, arrow=true, lw=2,ls=ls)
+		end
 
 
-# ╔═╡ 0634a72e-7492-40e0-ac1e-de706ae49ce0
+		
+	    
+end
+
+# ╔═╡ 55420322-e97a-4121-88b6-1296f3721383
 md"""
-在中学数学中我们已经学习过了直角坐标系的内容 ,一个有序的数组例如 $(2,3)$,或者 $(2,3,4)$,都可以标注在坐标系上. 坐标上的点可以通用表示为$(x,y,z)$,这和我们在第一章看到的线性方程组的变量解集形式一样. 两种形式的相似可以作为一个切入点, 看看能不能有更多的联系. 
+## 在坐标系中表示向量的加法.
 
- $(store["plot1"])
+如果向量表示为坐标向量, 我们在上一节说过,所有的向量的起点都在原点,  坐标向量之间的加法累积了在各个坐标轴方向上的变化. 
 
-当 数组$(2,3,4,5)$ 里的有序元素数量大于$3$ 时, 无法可视化, 但是我们任然可以想象出一个有四个坐标轴的坐标系, 数组$(2,3,4,5)$ 在想象的有四个坐标轴的坐标系中的行为和 $(2,3,4)$ 在三维坐标系中的行为是一样的. 
+用二维坐标向量来说明这个问题,如图
 
-这个想法还可以继续延伸, 一个$n$ 维的数组, 可以用$n$ 维的坐标系表示, 这个坐标系有 $n$ 个轴.
+ s   | u+v | v+u
+:--| :------------: | :--------:
+ | $(store["vec_sum1"]) | $(store["vec_sum2"])
 
-一组有$n$ 个数字组成的有序数组和有$n$ 条坐标轴的中的点是一一对应的, 这实际是一种函数映射关系. 
+
+两个坐标向量以及他们的和组成了一个平行四边形. 
+
+
+对角线是两个坐标向量的和, 方向为从原点指向两个向量对位元素和组成的坐标向量, 坐标向量和符合交换律, 交换位置, 不改变结果
+
+
 
 """
 
-# ╔═╡ 31ac6e4b-f6bd-408b-a9b1-dda7d9475e5c
+# ╔═╡ 130065ce-a599-44ee-94b2-134cf9349e7f
 let
-	p,q=(2,1),(-3,4)
+    zero=[0,0]
+	u=[2,1]
+	v=[1,3]
+	sum1=u+v
+	sum2=v+v
 	ann=[
-		(2,1.3,text(L"P=(2,1)",pointsize=12,color=:green)),
-		(-3,3.8,text(L"Q=(-3,4)",pointsize=12,color=:green))
+		(1,0.2,text(L"u",pointsize=16,rotation=20)),
+		(0.5,2,text(L"v",pointsize=14,rotation=20)),
+		(1.5,2.3,text(L"u+v",pointsize=14,rotation=45))
 	]
-	p1=scatter([p[1],q[1]],[p[2],q[2]], ms=6,frame=:origin,label=false,ann=ann,xlims=(-4,3),size=(360,360))
-	save("plot1",p1)
+	p1=vec_plot(zero,u)
+	p2=vec_plot!(zero,v)
+	p3=vec_plot!(zero,sum1)
+	p4=vec_plot!(u,sum1,:dash)
+	p5=vec_plot!(v,sum1,:dash)
+	p6=plot!(ann=ann,size=(320,320))
+	
+	save("vec_sum1",p6)
 	
 end
 
-# ╔═╡ 72d83fac-83aa-4828-9ad5-026965ce956e
-md"""
-## $n$ 维空间中的向量
-
-空间中的向量和坐标系中的点不同, 坐标系中的点由一组数字来度量, 空间中的向量度量的是大小和方向. 
-
-也就是说当向量的方向和大小相同时,两个向量代表同一个向量
-
- $(store["quiver"])
-
- 上面图中六个向量,在绘图时,使用 Plots.jl 软件包. 
-
-```julia
-quiver([1,2],[1,1],quiver=([1,1],[1,1]))
-```
-
-`[1,2],[1,1]` 代表向量启示的坐标, `[1,1],[1,1]`, 代表两个向量在$x,y$ 方向上的增量. 可以看到增量一样,如果用勾股定理可以得到几个向量和水平方向的夹角相同, 斜边长度也相同. 
-
-
-这里的向量是物理意义上的向量, 要知道箭尾的坐标和到达箭头的增量信息. 
-
-
-
-"""
-
-# ╔═╡ 90cd69ef-229a-4588-b068-5903fb752a6b
+# ╔═╡ 08e3219d-9c7b-42e8-a71e-169c7e16e8e5
 let
+    zero=[0,0]
+	u=[2,1]
+	v=[1,3]
+	sum1=u+v
+	sum2=v+u
+	ann=[
+		(1,0.2,text(L"u",pointsize=16,rotation=20)),
+		(0.5,2,text(L"v",pointsize=14,rotation=20)),
+		(1.5,2.3,text(L"v+u",pointsize=14,rotation=45))
+	]
+	p1=vec_plot(zero,u)
+	p2=vec_plot!(zero,v)
+	p3=vec_plot!(zero,sum2)
+	p4=vec_plot!(u,sum2,:dash)
+	p5=vec_plot!(v,sum2,:dash)
+	p6=plot!(ann=ann,size=(320,320))
 	
+	save("vec_sum2",p6)
 	
-	quiver([1,2,3,2,1,3],[1,1,3,3,3,1],quiver=([1,1,1,1,1,1],[1,1,1,1,1,1]),size=(360,360))
-	vector=plot!([3,4,4],[1,1,2],label=false,ls=:dash, lw=1, color=:red)
-	save("quiver",vector)
-
-
 end
 
-# ╔═╡ 29119d71-40a8-4aa9-bd15-c66827ae72bd
+# ╔═╡ 5b998cd0-d120-4158-9fce-b63d386bc716
 md"""
-## 坐标系里的点和物理意义向量之间的联系
+## 在坐标系中表示向量的差
 
-描述物理意义的向量需要知道箭尾信息和达到箭头的变化信息. 对于坐标系里的点通过简单的变换,就可以描述为物理意义的向量. 当坐标系里所有向量的尾部都选在$0$ 点. 例如在三维坐标系中, $\begin{bmatrix}0\\ 0\\0 \end{bmatrix}$ 点作为所有向量的尾巴, 三维空间中点的坐标表示为从$0$ 点开始的变化信息,例如$\begin{bmatrix}1\\ 1\\1 \end{bmatrix}$ 三个数字就表示在三个坐标轴方向上的变化情况. 
+两个向量的差与和不同, 顺序很重要,$u-v$ 与 $v-u$  如果$v \neq u$, 则两者差指向相反的方向
 
- $(store["plot2"])
+如下图
 
-上图就描述两个点与向量之间的的关系, 都从$\begin{bmatrix}0\\0\end{bmatrix}$ 点出发, 指向不同的位置.由于坐标系中向量都有这个属性, 所以在描述的时候省略从$0$ 点出发这个声明. 
-
-另外一个需要注意的点是: 由于坐标系中坐标轴的单位可以变化, 当我们把空间一个点映射到不同单位坐标下, 表示方法不同, 但是代表的是同一个点. 这个问题会在基变换中提到. 基变换是线性代数中非常复杂的问题, 可以看到在定义的时候就已经有迹可循.  
-
-现在坐标系中的点可以用坐标表示位置,表示向量, 合并起来就成为**坐标向量**
-
-后面在坐标系中描述向量的时候都默认使用点的坐标表示向量, 省略从原点出发这一信息. 
-
-**注:在绘制向量的箭头时, 你无法省略出发点的坐标, 否则计算机也不知道坐标的意义**
-
-
+$(store["vec_difference"])
 """
 
-# ╔═╡ 9d9813eb-6262-4d04-8d64-7084c9dcd1b7
+# ╔═╡ a8f990f3-45a7-4884-a487-a94766233153
 let
-	p,q=(2,1),(-3,4)
+    zero,u,v=[0,0],[2,1],[1,3]
+	diff1,diff2=u-v,v-u
+	
 	ann=[
-		(2,1.3,text(L"P=(2,1)",pointsize=12,color=:green)),
-		(-3,3.8,text(L"Q=(-3,4)",pointsize=12,color=:green))
+		(1,0.2,text(L"u",pointsize=16,rotation=20,color=:red)),
+		(0.5,2,text(L"v",pointsize=14,rotation=20,color=:red)),
+		(0.5,-1.2,text(L"u-v",pointsize=14,rotation=-30,color=:red)),
+		(-0.5,1.2,text(L"v-u",pointsize=14,rotation=-30,color=:red))
 	]
-	p1=plot([0,q[1]],[0,q[2]], arrow=true,frame=:origin,label=false,ann=ann,xlims=(-4,3),size=(360,360))
-	p2=plot!([0,p[1]],[0,p[2]], arrow=true,frame=:origin,label=false,ann=ann,xlims=(-4,3),size=(360,360))
-	save("plot2",p2)
+	p1=vec_plot(zero,u)
+	p2=vec_plot!(zero,v)
+	p3=vec_plot!(zero,diff1)
+	#p4=vec_plot!(u,v,:dash)
+	#p5=vec_plot!(u,diff1,:dash)
+	p6=vec_plot!(zero,diff2)
+	p7=plot!(ann=ann)
+	save("vec_difference",p7)
 	
 end
 
@@ -1537,15 +1599,19 @@ version = "0.9.1+5"
 """
 
 # ╔═╡ Cell order:
-# ╟─034f5085-a8e7-4d51-b1d8-9b9cedc2c789
-# ╟─f802779e-fab0-11ec-2852-add639985750
-# ╠═c9237a6e-e010-4961-93b5-066797135c37
-# ╠═0634a72e-7492-40e0-ac1e-de706ae49ce0
-# ╠═31ac6e4b-f6bd-408b-a9b1-dda7d9475e5c
-# ╠═72d83fac-83aa-4828-9ad5-026965ce956e
-# ╠═90cd69ef-229a-4588-b068-5903fb752a6b
-# ╠═29119d71-40a8-4aa9-bd15-c66827ae72bd
-# ╠═9d9813eb-6262-4d04-8d64-7084c9dcd1b7
-# ╠═bb98950e-5bdd-4e87-bca6-a968b390c557
+# ╟─40c13c25-31cb-493b-b5f7-60134fe3b37c
+# ╟─18adba76-fb33-11ec-36a8-2f0cf36ab653
+# ╟─44cf51da-0970-4033-b6f5-3441b750706c
+# ╠═4b0d8010-9240-4136-b789-365ead83c9c7
+# ╟─3536a108-aa3f-46bc-9b55-347a7bbf769a
+# ╟─ea0a42c8-25f1-4b96-b15c-99f7882c2a15
+# ╟─fadb4e73-fa7f-451d-8345-8920ec405404
+# ╠═55420322-e97a-4121-88b6-1296f3721383
+# ╠═130065ce-a599-44ee-94b2-134cf9349e7f
+# ╠═08e3219d-9c7b-42e8-a71e-169c7e16e8e5
+# ╠═5b998cd0-d120-4158-9fce-b63d386bc716
+# ╠═a8f990f3-45a7-4884-a487-a94766233153
+# ╟─7920fee3-26ce-4e06-9b5f-7c8ee47eb242
+# ╠═7c9d9dce-bed0-45bc-b70c-09c7952c4350
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
