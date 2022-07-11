@@ -4,9 +4,19 @@
 using Markdown
 using InteractiveUtils
 
-# ╔═╡ e2024006-fcfd-11ec-1b29-41546d0924f1
+# This Pluto notebook uses @bind for interactivity. When running this notebook outside of Pluto, the following 'mock version' of @bind gives bound variables a default value (instead of an error).
+macro bind(def, element)
+    quote
+        local iv = try Base.loaded_modules[Base.PkgId(Base.UUID("6e696c72-6542-2067-7265-42206c756150"), "AbstractPlutoDingetjes")].Bonds.initial_value catch; b -> missing; end
+        local el = $(esc(element))
+        global $(esc(def)) = Core.applicable(Base.get, el) ? Base.get(el) : iv(el)
+        el
+    end
+end
+
+# ╔═╡ 7137a6b6-ff34-11ec-030a-79678d700cd3
 begin
-        using PlutoUI, Plots,DataFrames,HypertextLiteral,LaTeXStrings,Symbolics,LinearAlgebra,RowEchelon
+        using PlutoUI, Plots,DataFrames,HypertextLiteral,LaTeXStrings,Symbolics,LinearAlgebra,RowEchelon,Latexify
         gr()
         theme(:bright)
         @htl("""<script src="https://cdn.bootcdn.net/ajax/libs/mathjax/3.2.0/es5/tex-svg-full.min.js"></script>
@@ -14,252 +24,210 @@ begin
         PlutoUI.TableOfContents()
  end
 
-# ╔═╡ 5fff0cf2-6d56-4ee0-ac45-f6c6e0e39a6a
+# ╔═╡ 3b47a19f-163c-4988-acf3-032adf8b6eea
 PlutoUI.Resource("https://tva1.sinaimg.cn/thumbnail/e6c9d24egy1h2alsw1tzxj20m80gomxn.jpg")
 
 
-# ╔═╡ 1c0176b7-931e-499a-9d56-239cfba7e9f2
-md"""
-# ch03 sec3.1 直线
-
+# ╔═╡ fb47da0c-aaa3-48f6-ae8a-586dd8480a18
+md"#  ch05 sec5.1 生成空间(span)
 !!! outcomes
 
-    - A.求直线的向量, 参数和对称方程
+    - A. 确定生成空间的一组向量
+    - B. 判断一个向量是否在一个特定的空间中
 
-    - B.判断一个点是否在一条给定直线上
 
-    - C.判断两条直线是否相交
+在南美洲秘鲁南部高原上,有一个地方叫纳兹卡, 在没有发明飞机之前,这里的地面的特征和其他荒漠的特征没什么区别, 但是在人类发明了飞机之后, 当飞机飞过纳兹卡的时候, 飞行员竟然发现地面有着无比巨大的动植物线条图
 
-    - D.求两条之间之间的夹角
+![](https://tva1.sinaimg.cn/orj360/e6c9d24egy1h40idgb11zj20d30dcmxl.jpg)
 
-    - E. 求一个点在直线上的投影
-"""
+当我们的视野从二维平面拓展到三维空间, 会获得一些不同的性质. 所以在探索一个实体对象的性质的时候, 维度是首先要考虑的问题. 
 
-# ╔═╡ ad07c025-633f-4ae2-995e-27641764873a
+张成(span) 这个概念正是基于此, 在我们在研究数学对象之前, 能够首先知道对象是什么空间的对象,对于下一步研究更多的属性直观重要. 
+
+我们在二维空间中看到的一个点是一个点, 圆环是一个圆环, 但是在三维空间中, 我们看到的点或许是一个球体和二维平面的一个交点,  看到的圆环可能是球面和平面相交的曲线部分.
+"
+
+# ╔═╡ 7d38e4d4-9d10-4cca-9f6c-0a459bf52ede
 md"""
-!!! example 
-    example 4  经过两点的直线
-
-    给定 $P=(1,2,0,1)$ 和向量$R=(2,-4,6,3)$ 求经过两点的直线方程
-
-
-在两个点中取任意一个点都可以, 然后确定方向向量$d$, 方向向量是两个向量的差
-
-$\vec{d}=\vec{R}-\vec{P}=\begin{bmatrix}2\\ -4\\ 6\\ 3\end{bmatrix}-\begin{bmatrix}1\\2 \\0 \\1 \end{bmatrix}=\begin{bmatrix}1\\-6 \\6 \\2 \end{bmatrix}$
-
-经过两点的直线上点的坐标向量可以表示为:
-
-
-$\begin{bmatrix}x\\y\\ z\\ w\end{bmatrix}=\begin{bmatrix}1\\2 \\0 \\1 \end{bmatrix}+t\begin{bmatrix}1\\-6 \\6 \\2 \end{bmatrix}$
-
-
- $n$ 维空间中经过两点直线上的点的坐标向量表示为:
-
-$$\begin{bmatrix}x_1\\x_2\\\vdots\\ x_n\end{bmatrix}=\begin{bmatrix}p_1\\p_2 \\ \vdots \\p_n\end{bmatrix}+t\begin{bmatrix}d_1\\d_2\\\vdots \\d_n \end{bmatrix}$$
-"""
-
-# ╔═╡ b2a95afc-2f72-46b3-8159-c3b02229bfc7
-md"""
-
-
-!!! defintion
-
-    直线的参数方程
-
-    上述的坐标向量方法, 可以展开为参数方程组成的方程组, 实际我们在所有的描点法绘制图形时,使用的都是这中方法
-
-    $$\begin{bmatrix}x_1\\x_2\\\vdots\\ x_n\end{bmatrix}=\begin{bmatrix}p_1\\p_2 \\ \vdots \\p_n\end{bmatrix}+t\begin{bmatrix}d_1\\d_2\\\vdots \\d_n \end{bmatrix}$$
-
-$x_1=p_1+td_1$
-$x_2=p_2+td_2$
-$$\vdots$$
-$$x_n=p_n+td_n$$
-
-
-!!! example
-
-    example 5   给定 $P=(1,2,0,1)$ 和向量$R=(2,-4,6,3)$ 求经过两点的直线上点的参数方程
-
-
-$\begin{bmatrix}x\\y\\ z\\ w\end{bmatrix}=\begin{bmatrix}1\\2 \\0 \\1 \end{bmatrix}+t\begin{bmatrix}1\\-6 \\6 \\2 \end{bmatrix}$
-
-改写为:
-
-
-
-$$\begin{cases}
- x=1+t \\ 
- y=2-6t  \\ 
- z=6t\\ 
- w=1+2t
-\end{cases}$$
-   
-"""
-
-# ╔═╡ badc2be9-2483-40f5-af0c-6f3b1fa0cbe2
-md"""
-
-!!! example
-    example 6 一个点到直线的最短距离
-
-    假设直线$L$ 通过点$P=(0,4,-2)$,方向向量为$d=[2,1,2]'$, 直线外一点坐标为:$Q=(1,3,5)$ , 求$Q$ 到直线$L$ 的最短距离,以及直线上距离$Q$ 最近的点
-
-![](https://tva1.sinaimg.cn/orj360/e6c9d24egy1h3y3txnc5mj20ia08aaa6.jpg)
-
-
-实际要求 $Q$ 点在 直线上的投影, 首先要知道$\vec{PQ}$,等于头部减去尾部
-
-$\vec{PQ}=\begin{bmatrix}1\\3\\5\end{bmatrix}  -\begin{bmatrix}0\\4\\2\end{bmatrix}=\begin{bmatrix}1\\-1\\ 7\end{bmatrix}$
-
-向量$\vec{PQ}$ 在 直线上的投影表示为:
-
-$\vec{PR}=\frac{d \cdot \vec{PQ} }{||d||^2}d=\frac{5}{3}\begin{bmatrix}2\\1\\ 2\end{bmatrix}$
-
-
-$||RQ||$ 点到直线的距离等于 $||\vec{PQ}-\vec{PR}||$
-
-$||RQ||=||\vec{PQ}-\vec{PR}||=\sqrt{26}$
-
-
-$R$ 点的坐标向量为:
-
-$\begin{bmatrix}0\\4\\2\end{bmatrix}+\frac{5}{3}\begin{bmatrix}2\\1\\ 2\end{bmatrix}$
-
-
-
-
-"""
-
-# ╔═╡ 3d73b3bb-1d06-4c71-8930-ecf63eac65f5
-begin
-        store=Dict()
-    
-        function save(key::String, dict)
-            store[key]=dict
-        end
-        
-        function read(key::String)
-            return  store[key]
-        end
-	
-
-	    function vec_plot(v1,v2,ls=:solid)
-			v11,v12=v1[1],v1[2]
-			v21,v22=v2[1],v2[2]
-			return plot([v11,v21],[v12,v22],label=false, arrow=true, lw=2,ls=ls)
-		end
-
-	    function vec_plot!(v1,v2,ls=:solid)
-			v11,v12=v1[1],v1[2]
-			v21,v22=v2[1],v2[2]
-			return plot!([v11,v21],[v12,v22],label=false, arrow=true, lw=2,ls=ls)
-		end
-
-	    function vec_plot3d(v1,v2,ls=:solid)
-			v11,v12,v13=v1[1],v1[2],v1[3]
-			v21,v22,v23=v2[1],v2[2],v2[3]
-			return plot([v11,v21],[v12,v22],[v13,v23],label=false, lw=1,ls=ls)
-		end
-
-	    function vec_plot3d!(v1,v2,ls=:solid)
-			v11,v12,v13=v1[1],v1[2],v1[3]
-			v21,v22,v23=v2[1],v2[2],v2[3]
-			return plot!([v11,v21],[v12,v22],[v13,v23],label=false, lw=1,ls=ls)
-		end
-
-	    function dist(p,q)
-			length=size(p)
-			arr=[(abs(p[i]-q[i]))^2 for i in 1:length[1]]
-			return sqrt(sum(arr))
-		end
-
-
-end
-
-# ╔═╡ 605feda5-59f5-428d-a6f0-a30bcf697ecc
-md"""
-在前面我们可以从一个点出发, 画出指向另个点的箭头, 第一个点作为尾部, 第二个点作为头部, 这就是向量. 只要方向相同, 或者相反, 我们可以画出无数个向量, 这些向量集合就可以用一条直线来表示 
-
-下面我们画出几个代表
-
- $(store["plotline"])
-
- 给定两个向量, $u,v$, $d$ 表示从$u$ 到 $v$ 的方向.  这个向量是一个相对值, 加上第一个向量就代表向量在坐标系下的坐标.  给$d$ 倍乘任意实数表示沿着这个方向所有的向量, 包括相反方向的.
+在二维空间中给定两个向量$v_1,v_2$, 绘出两个向量的标量乘积和, 就可以分布在平面中
 
 ```julia
-
-  vec1,vec2=[1,1],[2,2]
-
-  d= vec2-vec1
-
-  nvec(k)=vec1+k*d
+n=0.2
+range=-4:n:4
 ```
+与两个向量相乘的标量可以从实数中获取, 在绘图时限定在$-4:4$ 之间, 由于实轴是没有空洞的, 所以有无限个数, 在实际画图中画不出无限个点, 我们在区间中 每隔 step 步长, 获取两个向量的标量乘积和. 当step 
+很小的时候, 坐标向量点会覆盖几乎整个平面
+"""
 
-这里实现的实际是一条仿射直线, 我们在微积分中已经提到过.  从一个点出发, 给定一个方向向量, 在这条直线上的向量坐标都可以用如下公式来表示:
+# ╔═╡ 1ffdf357-3661-4680-97c4-045d353240f8
+@bind step Slider(0.1:0.1:1;default=1,show_value=true)
 
-!!!  definition
+# ╔═╡ 2be004ef-0125-4727-8a4d-944f8750fac5
+let
+	v1,v2=[-1 1],[ 1 1]
+	xs,ys=[],[]
+    range=-4:step:4
+    arr=[x*v1+y*v2 for x in range ,y in range]
+	for m in arr
+		push!(xs,m[1])
+		push!(ys,m[2])
+	end
+	scatter(xs,ys,label=false,markersize=3,framestyle=:origin,color=:red)
+	plot!([0,2*v1[1]],[0,2*v1[2]],arrow=3,lw=3,label=false)
+	plot!([0,2*v2[1]],[0,2*v2[2]],arrow=3,lw=3,;label=false)
+	
+end
 
-     $p$ 为空间任意向量, $d$ 也是一个向量,两者结合可以表示一条通过两点的直线:
+# ╔═╡ f2940657-655c-4fc1-a2a4-b98b44b66edd
+let
+	v1,v2=[-1 1],[ 1 1]
+	xs,ys=[],[]
+    range=-10:step:10
+    arr=[x*v1+y*v2 for x in range ,y in range]
+	for m in arr
+		push!(xs,m[1])
+		push!(ys,m[2])
+	end
+	scatter(xs,ys,label=false,markersize=3,framestyle=:origin,color=:red)
+	plot!([0,2*v1[1]],[0,2*v1[2]],arrow=3,lw=3,label=false)
+	plot!([0,2*v2[1]],[0,2*v2[2]],arrow=3,lw=3,;label=false)
+	
+end
 
-    $q=p+td$
+# ╔═╡ 877f3d6b-7edd-4179-a2d0-3f51088f2e12
+md"""
+ 两个向量各自的标量乘积组合也形成一个平面. 这是一般形式
+"""
 
-     $t \in R, d 称为方向向量$
+# ╔═╡ d69721cc-e444-4fa8-890f-c3fb0e531433
+let
+	plotly()
+	v1=[-1 1 2]
+	v2=[ 1 1 2]
+    xs=[]
+	ys=[]
+	zs=[]
+	range=-4:1:4
+    arr=[x*v1+y*v2 for x in range ,y in range]
+	for m in arr
+		push!(xs,m[1])
+		push!(ys,m[2])
+		push!(zs,m[3])
+	end
+	scatter(xs,ys,zs, label=false,markersize=1,framestyle=:origin,color=:black)
+	plot!([0,2*v1[1]],[0,2*v1[2]], [0,2*v1[3]],arrow=3,lw=3,label=false)
+	plot!([0,2*v2[1]],[0,2*v2[2]],[0,2*v2[3]],arrow=3,lw=3,;label=false)
+	
+end
 
-!!! notice
+# ╔═╡ 07cb6ad8-5a0f-4d0f-a551-e63a6e09226a
+md"""
+!!! definition
+    若干个向量的标量乘积的和称为向量的线性组合. 
 
-    我们要在坐标系中画出一条直线,仅仅知道方向向量是不够得, 需要知道直线上每个点的坐标向量, 直线上每个点的坐标向量由任一点和方向向量执行加法得到. 
+    给定一组向量 $u_1, u_2, \cdots, u_k$ , 和一组系数$a_1, a_2,\cdots, a_k$, 系数和向量乘积的和表示为这些向量扩展的空间, 集合符号表示为:
 
-    如图:
+    $span \  \left \{ u_1,u_2, \cdots, u_k\right \} \ = \ \left \{a_1u_1, a_2u_2, \cdots, a_ku_k \ | \  a_1,a_2,\cdots, a_k \in R  \right \}$
+    
+"""
 
-   $(store["abline"])
+# ╔═╡ b717ad00-9e92-4770-aac7-13352ba6a507
+md"""
 
-知道了方向向量$\vec{PR}, 坐标向量为: \vec{OP}+\vec{PR}=\vec{OR}$
+!!! example
+    example 1 
 
-这个定义不仅仅在 二维和三维空间定义, 在$n$ 维空间同样也成立
+    给定两个向量$u=\begin{bmatrix} 1\\1 \\1 \end{bmatrix}$ 和 $v=\begin{bmatrix} 3\\2 \\1 \end{bmatrix}$, 下面两个向量, 哪个属于 $u,v$ 生成的空间中
+
+    a. $w=\begin{bmatrix} 2\\3 \\4 \end{bmatrix}$   b. $z=\begin{bmatrix} 1\\1 \\2 \end{bmatrix}$
+
+
+一个向量如果属于两个向量生成的空间中,根据定义可以表示为两个向量的标量乘积, 假设两个标量$a,b$ 则有如下关系:
+
+$au+bv=w$
+$au+bv=z$
+
+带入向量得到:
+
+$a\begin{bmatrix} 2\\3 \\4 \end{bmatrix}+b\begin{bmatrix} 3\\2 \\1 \end{bmatrix}=\begin{bmatrix} 2\\3 \\4 \end{bmatrix}$
+
+$a\begin{bmatrix} 2\\3 \\4 \end{bmatrix}+b\begin{bmatrix} 3\\2 \\1 \end{bmatrix}=\begin{bmatrix} 1\\1 \\2 \end{bmatrix}$
+
+
+这就是线性方程组的向量形式. 
+
+使用消元法分别可以获取两个方程组的简化阶梯型增广矩阵,如果方程组相容, 则向量在生成的空间中
+    
+"""
+
+# ╔═╡ 365f7b8c-fe11-43d5-b96d-305e710d005a
+let
+m1=[1 0 5;
+    0 1 -1;
+    0 0  0 
+]
+latexify(m1)
+
+#  矩阵是相容的, 所以 a 属于 u,v 生成的空间
+ end
+
+# ╔═╡ 77581957-916b-421f-9010-b532389061d5
+let
+m2=[1 3 1;
+    0 -1 0;
+    0 0  1 
+]
+latexify(m2)
+
+#  矩阵是不相容的, 所以 b  不属于属于 u,v 生成的空间
+ end
+
+# ╔═╡ f2a83b3e-9357-4563-8592-0e4718e01ce8
+md"""
+
+!!! example
+
+    example 2
+
+    描述一下由向量 $u=\begin{bmatrix} 1\\1 \\1 \end{bmatrix}$ 和 $v=\begin{bmatrix} 3\\2 \\1 \end{bmatrix}$ 生成的空间
+
+
+假定向量 $\begin{bmatrix} x\\y \\z\end{bmatrix}$ 属于$u,v$ 生成的空间中, 则未知向量可以表示为两个向量的标量和:
+
+$a\begin{bmatrix} 2\\3 \\4 \end{bmatrix}+b\begin{bmatrix} 3\\2 \\1 \end{bmatrix}=\begin{bmatrix} x\\y \\z\end{bmatrix}$
 
 """
 
-# ╔═╡ adcfdecb-bf60-45ef-9cd1-fcfefd14d03d
-let
-     kspan=-4:0.5:5
-     vec1,vec2=[1,1],[2,2]
-	 d= vec2-vec1
-	 nvec(k)=vec1+k*d
-     plotarr=[]
-     for (i,k) in enumerate(kspan)
-				if i==1
-					p=vec_plot(vec1,vec1+nvec(k))
-					push!(plotarr,p)
-				else
-					p=vec_plot!(vec1,vec1+nvec(k))
-					push!(plotarr,p)
-				end
-	 end
-
-	 line=plot!(plotarr... ,label=false,frame=:zerolines)
-	 scatter!([vec1[1],vec2[1]],[vec1[2],vec2[2]],ms=4,mc=:red)
-	 save("plotline",line)
-
+# ╔═╡ 3ba03b5f-37f2-4bc8-8de9-086e03ad427d
+begin
+	@variables x, y, z
+    r1,r2,r3=[1 3 x],[1 2 y],[1 1 z]
+	matrix1=[r1;r2;r3]
 end
 
-# ╔═╡ 290552bf-2b48-4900-9d9d-f0604ef805d8
-let
-     gr()
-     zero,vec1,vec2=[0,0],[1,3],[2,4]
-	 d= vec2-vec1
-	 nvec(k)=vec1+k*d
-     ann=[
-		 (0.5,2,text(L"\vec{OP}",pointsize=13,rotation=30)),
-		 (1.25,3.5,text(L"\vec{PR}",pointsize=13,rotation=10)),
-		 (1,1.5,text(L"\vec{OR}",pointsize=13,rotation=45)),
-		 (1,3.2,text(L"P",pointsize=13,rotation=10)),
-		  (2,4.2,text(L"R",pointsize=13,rotation=10))
-	 ]
-	plot([zero[1],vec2[1],vec1[1],zero[1]],[zero[2],vec2[2],vec1[2],zero[2]],label=false)
-	p1=scatter!([zero[1],vec2[1],vec1[1],zero[1]],[zero[2],vec2[2],vec1[2],zero[2]],label=false,ann=ann,frame=:semi)
-     
-    save("abline",p1)
+# ╔═╡ eb11e6b1-8fa6-4cb0-86e2-5168e9851667
+begin
+  r11,r12,r13=matrix1[1,:]',matrix1[2,:]',matrix1[3,:]'
+  r12=r12-r11  # 新第二行等于第二行减去第一行
+  r13=r13-r11  # 新第三行等于第三行减去第一行
+  matrix2=[r11;r12;r13]
 end
+
+# ╔═╡ a0a05ee4-463a-4dea-9757-430f6aabe8b6
+begin
+  r21,r22,r23=matrix2[1,:]',matrix2[2,:]',matrix2[3,:]'
+  r23=r23-2*r22   # 第三行减去两倍的第二行
+  matrix3=[r21;r22;r23]
+end
+
+# ╔═╡ 2c3acb31-eec7-4fc6-b180-db32ed868a0b
+md"""
+ 由阶梯型矩阵的最后一行可以得到方程:
+
+$x-2y+z=0$
+
+这是一个二元一次方程, 图像是一个平面
+"""
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
@@ -267,6 +235,7 @@ PLUTO_PROJECT_TOML_CONTENTS = """
 DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
 HypertextLiteral = "ac1192a8-f4b3-4bfe-ba22-af5b92cd3ab2"
 LaTeXStrings = "b964fa9f-0449-5b57-a5c2-d3ea65f4040f"
+Latexify = "23fbe1c1-3f47-55db-b15f-69d7ec21a316"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
 PlutoUI = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
@@ -277,6 +246,7 @@ Symbolics = "0c5d862f-8b57-4792-8d23-62f2024744c7"
 DataFrames = "~1.3.4"
 HypertextLiteral = "~0.9.4"
 LaTeXStrings = "~1.3.0"
+Latexify = "~0.15.15"
 Plots = "~1.31.1"
 PlutoUI = "~0.7.39"
 RowEchelon = "~0.2.1"
@@ -292,9 +262,9 @@ manifest_format = "2.0"
 
 [[deps.AbstractAlgebra]]
 deps = ["GroupsCore", "InteractiveUtils", "LinearAlgebra", "MacroTools", "Markdown", "Random", "RandomExtensions", "SparseArrays", "Test"]
-git-tree-sha1 = "dd2f52bc149ff35158827471453e2e4f1a2685a6"
+git-tree-sha1 = "5d984b08291a3f99891f48007d244221182200cc"
 uuid = "c3fe647b-3220-5bb0-a1ea-a7954cac585d"
-version = "0.26.0"
+version = "0.26.2"
 
 [[deps.AbstractPlutoDingetjes]]
 deps = ["Pkg"]
@@ -537,9 +507,9 @@ uuid = "8ba89e20-285c-5b6f-9357-94700520ee1b"
 
 [[deps.Distributions]]
 deps = ["ChainRulesCore", "DensityInterface", "FillArrays", "LinearAlgebra", "PDMats", "Printf", "QuadGK", "Random", "SparseArrays", "SpecialFunctions", "Statistics", "StatsBase", "StatsFuns", "Test"]
-git-tree-sha1 = "d530092b57aef8b96b27694e51c575b09c7f0b2e"
+git-tree-sha1 = "429077fd74119f5ac495857fd51f4120baf36355"
 uuid = "31c24e10-a181-5473-b8eb-7969acd0382f"
-version = "0.25.64"
+version = "0.25.65"
 
 [[deps.DocStringExtensions]]
 deps = ["LibGit2"]
@@ -664,9 +634,9 @@ version = "0.64.4"
 
 [[deps.GR_jll]]
 deps = ["Artifacts", "Bzip2_jll", "Cairo_jll", "FFMPEG_jll", "Fontconfig_jll", "GLFW_jll", "JLLWrappers", "JpegTurbo_jll", "Libdl", "Libtiff_jll", "Pixman_jll", "Pkg", "Qt5Base_jll", "Zlib_jll", "libpng_jll"]
-git-tree-sha1 = "3a233eeeb2ca45842fe100e0413936834215abf5"
+git-tree-sha1 = "067fecedcecb6a923bc0227bf0a989175ef9565c"
 uuid = "d2c73de3-f751-5644-a686-071e5b155ba9"
-version = "0.64.4+0"
+version = "0.65.1+0"
 
 [[deps.GeometryBasics]]
 deps = ["EarCut_jll", "IterTools", "LinearAlgebra", "StaticArrays", "StructArrays", "Tables"]
@@ -1019,9 +989,9 @@ uuid = "05823500-19ac-5b8b-9628-191a04bc5112"
 
 [[deps.OpenSSL_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
-git-tree-sha1 = "9a36165cf84cff35851809a40a928e1103702013"
+git-tree-sha1 = "e60321e3f2616584ff98f0a4f18d98ae6f89bbb3"
 uuid = "458c3c95-2e84-50aa-8efc-19380b2a3a95"
-version = "1.1.16+0"
+version = "1.1.17+0"
 
 [[deps.OpenSpecFun_jll]]
 deps = ["Artifacts", "CompilerSupportLibraries_jll", "JLLWrappers", "Libdl", "Pkg"]
@@ -1048,9 +1018,9 @@ version = "8.44.0+0"
 
 [[deps.PDMats]]
 deps = ["LinearAlgebra", "SparseArrays", "SuiteSparse"]
-git-tree-sha1 = "ca433b9e2f5ca3a0ce6702a032fce95a3b6e1e48"
+git-tree-sha1 = "cf494dca75a69712a72b80bc48f59dcf3dea63ec"
 uuid = "90014a1f-27ba-587c-ab20-58faa44d9150"
-version = "0.11.14"
+version = "0.11.16"
 
 [[deps.Parameters]]
 deps = ["OrderedCollections", "UnPack"]
@@ -1171,9 +1141,9 @@ version = "0.5.2"
 
 [[deps.RecursiveArrayTools]]
 deps = ["Adapt", "ArrayInterfaceCore", "ArrayInterfaceStaticArraysCore", "ChainRulesCore", "DocStringExtensions", "FillArrays", "GPUArraysCore", "LinearAlgebra", "RecipesBase", "StaticArraysCore", "Statistics", "ZygoteRules"]
-git-tree-sha1 = "7ddd4f1ac52f9cc1b784212785f86a75602a7e4b"
+git-tree-sha1 = "7a5f08bdeb79cf3f8ce60125fe1b2a04041c1d26"
 uuid = "731186ca-8d62-57ce-b412-fbd966d074cd"
-version = "2.31.0"
+version = "2.31.1"
 
 [[deps.Reexport]]
 git-tree-sha1 = "45e428421666073eab6f2da5c9d310d99bb12f9b"
@@ -1332,9 +1302,9 @@ uuid = "4607b0f0-06f3-5cda-b6b1-a6196a1729e9"
 
 [[deps.SymbolicUtils]]
 deps = ["AbstractTrees", "Bijections", "ChainRulesCore", "Combinatorics", "ConstructionBase", "DataStructures", "DocStringExtensions", "DynamicPolynomials", "IfElse", "LabelledArrays", "LinearAlgebra", "Metatheory", "MultivariatePolynomials", "NaNMath", "Setfield", "SparseArrays", "SpecialFunctions", "StaticArrays", "TermInterface", "TimerOutputs"]
-git-tree-sha1 = "92b21f756625f2ff3b2a05495c105f432be01e17"
+git-tree-sha1 = "027b43d312f6d52187bb16c2d4f0588ddb8c4bb2"
 uuid = "d1185830-fcd6-423d-90d6-eec64667417b"
-version = "0.19.10"
+version = "0.19.11"
 
 [[deps.Symbolics]]
 deps = ["ArrayInterfaceCore", "ConstructionBase", "DataStructures", "DiffRules", "Distributions", "DocStringExtensions", "DomainSets", "Groebner", "IfElse", "Latexify", "Libdl", "LinearAlgebra", "MacroTools", "Metatheory", "NaNMath", "RecipesBase", "Reexport", "Requires", "RuntimeGeneratedFunctions", "SciMLBase", "Setfield", "SparseArrays", "SpecialFunctions", "StaticArrays", "SymbolicUtils", "TermInterface", "TreeViews"]
@@ -1656,15 +1626,23 @@ version = "0.9.1+5"
 """
 
 # ╔═╡ Cell order:
-# ╟─5fff0cf2-6d56-4ee0-ac45-f6c6e0e39a6a
-# ╟─e2024006-fcfd-11ec-1b29-41546d0924f1
-# ╟─1c0176b7-931e-499a-9d56-239cfba7e9f2
-# ╠═605feda5-59f5-428d-a6f0-a30bcf697ecc
-# ╠═adcfdecb-bf60-45ef-9cd1-fcfefd14d03d
-# ╠═290552bf-2b48-4900-9d9d-f0604ef805d8
-# ╠═ad07c025-633f-4ae2-995e-27641764873a
-# ╠═b2a95afc-2f72-46b3-8159-c3b02229bfc7
-# ╠═badc2be9-2483-40f5-af0c-6f3b1fa0cbe2
-# ╠═3d73b3bb-1d06-4c71-8930-ecf63eac65f5
+# ╟─3b47a19f-163c-4988-acf3-032adf8b6eea
+# ╟─7137a6b6-ff34-11ec-030a-79678d700cd3
+# ╟─fb47da0c-aaa3-48f6-ae8a-586dd8480a18
+# ╠═7d38e4d4-9d10-4cca-9f6c-0a459bf52ede
+# ╠═1ffdf357-3661-4680-97c4-045d353240f8
+# ╠═2be004ef-0125-4727-8a4d-944f8750fac5
+# ╠═f2940657-655c-4fc1-a2a4-b98b44b66edd
+# ╠═877f3d6b-7edd-4179-a2d0-3f51088f2e12
+# ╠═d69721cc-e444-4fa8-890f-c3fb0e531433
+# ╠═07cb6ad8-5a0f-4d0f-a551-e63a6e09226a
+# ╠═b717ad00-9e92-4770-aac7-13352ba6a507
+# ╠═365f7b8c-fe11-43d5-b96d-305e710d005a
+# ╠═77581957-916b-421f-9010-b532389061d5
+# ╠═f2a83b3e-9357-4563-8592-0e4718e01ce8
+# ╠═3ba03b5f-37f2-4bc8-8de9-086e03ad427d
+# ╠═eb11e6b1-8fa6-4cb0-86e2-5168e9851667
+# ╠═a0a05ee4-463a-4dea-9757-430f6aabe8b6
+# ╠═2c3acb31-eec7-4fc6-b180-db32ed868a0b
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002

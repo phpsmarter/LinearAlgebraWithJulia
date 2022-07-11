@@ -4,262 +4,457 @@
 using Markdown
 using InteractiveUtils
 
-# ╔═╡ e2024006-fcfd-11ec-1b29-41546d0924f1
+# ╔═╡ 17b89e58-001d-11ed-2248-9b3e5bdd29e9
 begin
-        using PlutoUI, Plots,DataFrames,HypertextLiteral,LaTeXStrings,Symbolics,LinearAlgebra,RowEchelon
+        using PlutoUI, Plots,DataFrames,HypertextLiteral,LaTeXStrings,Symbolics,LinearAlgebra,RowEchelon,Latexify
         gr()
         theme(:bright)
-        @htl("""<script src="https://cdn.bootcdn.net/ajax/libs/mathjax/3.2.0/es5/tex-svg-full.min.js"></script>
-        """)
+        
         PlutoUI.TableOfContents()
+	    
  end
 
-# ╔═╡ 5fff0cf2-6d56-4ee0-ac45-f6c6e0e39a6a
+# ╔═╡ 78ba4a3c-9db9-4633-bfd3-a62ba5f92759
 PlutoUI.Resource("https://tva1.sinaimg.cn/thumbnail/e6c9d24egy1h2alsw1tzxj20m80gomxn.jpg")
 
 
-# ╔═╡ 1c0176b7-931e-499a-9d56-239cfba7e9f2
+# ╔═╡ 22bb9dba-0b50-473c-9827-f964bdf180f7
 md"""
-# ch03 sec3.1 直线
+# ch05 sec5.4  基向量和空间维度
 
 !!! outcomes
-
-    - A.求直线的向量, 参数和对称方程
-
-    - B.判断一个点是否在一条给定直线上
-
-    - C.判断两条直线是否相交
-
-    - D.求两条之间之间的夹角
-
-    - E. 求一个点在直线上的投影
+	- A. 求一个$R^n$ 子空间的基
+    - B. 使用排除算法求一组能生成空间的基向量
+    - C. 利用基本解组求给定的线性方程组解空间的基
+    - D. 求一个向量对应于基的坐标
+	- E. 求一个子空间的维度
+	- F. 扩展一组线性无关向量为基向量
+    - G. 移除冗余向量得到生成空间的一组基向量
+    - H. 判断 一组数量为 $k$ 的向量是否是$k$ 维空间的基向量
 """
 
-# ╔═╡ ad07c025-633f-4ae2-995e-27641764873a
+# ╔═╡ a4e6fd65-f169-42f9-a46e-4237d4607879
+md"""
+## 5.4.1 基(basis) 的定义
+
+!!! theorem 
+	子空间是生成集
+
+    设$V$ 是 $R^n$ 的子空间, 那么在$V$ 存在一组线性无关向量集合$\left \{ u_1, u_2,\cdots,u_k \right \}$:
+
+    $V=span \ \left \{ u_1, u_2,\cdots,u_k \right \}$
+
+
+也就是 每一个$R^n$ 的子空间 都可以有一组有限个向量张成. 
+
+
+!!! definition
+	子空间的基
+
+    设$V$ 是 $R^n$ 的子空间, 那么$\left \{ u_1, u_2,\cdots,u_k \right \}$ 定义为一组$V$ 空间的基, 如果满足如下条件:
+
+    1.  $span \left \{ u_1, u_2,\cdots,u_k \right \}=V$
+    2.  $u_1, u_2,\cdots,u_k$  是线性无关的
+"""
+
+# ╔═╡ 226ff11b-9698-422d-828b-c7251ba95ca1
+md"""
+!!! example
+	example 1   $R^n$ 空间的标准基
+
+    假定$e_i$ 是 $R^n$ 中的向量, 它的第$i$ 个分量值为$1$, 其他分量值都为$0$
+
+	$e_1=\begin{bmatrix}1\\0 \\0\\0\\ \vdots\\0 	\end{bmatrix},e_2=\begin{bmatrix}0\\1\\0\\0\\ \vdots\\0 \end{bmatrix},e_3=\begin{bmatrix}0\\0 \\1\\0\\ \vdots\\0 \end{bmatrix},\cdots,e_n=\begin{bmatrix}0\\0 \\0\\0\\ \vdots\\1 \end{bmatrix}$
+
+    那么有 $\left \{ e_1, e_2, \cdots , e_n \right\}$ 	是$R^n$ 空间的一组基向量, 由于$[e_1,e_2,\cdots, e_n]$ 矩阵是一个全等矩阵, 这组基又称为 $R^n$ 空间的标准基
+
+"""
+
+# ╔═╡ f933be0b-c0da-4fe0-b94c-c53cd3df7120
+md"""
+
+!!! example 
+	example 2 非标准基向量
+
+    判断下面的向量是否是$R^3$ 的 一组基向量
+
+    $u_1=\begin{bmatrix}1\\2 \\1\end{bmatrix},u_2=\begin{bmatrix}0\\1\\0\end{bmatrix},u_3=\begin{bmatrix}-1\\0\\1\end{bmatrix}$
+
+
+如果一组三个向量是线性无关的, 那么就可以作为$R^3$ 的一组基. 
+
+所有求解三个向量构造矩阵的简化阶梯型, 如果每列都有主元, 就可以判断这三个向量可以作为一组基
+"""
+
+# ╔═╡ f0bf2b82-6a5f-49ed-9410-e246ca1fc25b
+begin
+	 @variables  x, y, z
+	 u1,u2,u3,u4=[1,2,1],[0, 1, 0],[-1,0, 1],[x,y,z]
+	 matrix1=hcat(u1,u2,u3)
+	 latexify(matrix1)
+end
+
+# ╔═╡ 47ec0e91-624b-479b-b80c-a5a7700342cc
+begin
+    rref_matrix1=rref(matrix1)  # 求简化阶梯型矩阵
+	latexify(rref_matrix1)
+end
+
+# ╔═╡ 3571cbd1-9e22-4c13-bd25-97b1e52eee5e
+md"""
+ 从简化阶梯矩阵可以看到,每列都有主元, 所以三个向量线性无关, 可以作为$R^3$ 空间的一组基
+"""
+
+# ╔═╡ bb944052-96e7-4244-81d9-194fe3b703dc
+md"""
+!!! example
+    example 3   生产空间的一组基
+
+    假设有一下向量
+    $u_1=\begin{bmatrix}2\\0 \\-2\end{bmatrix},u_2=\begin{bmatrix}-1\\0\\1\end{bmatrix},u_3=\begin{bmatrix}1\\3\\5\end{bmatrix},u_4=\begin{bmatrix}3\\5\\7\end{bmatrix},u_5=\begin{bmatrix}-1\\1\\3\end{bmatrix}$
+
+由向量构造矩阵, 然后简化矩阵, 有主元列的向量就是生成空间的基
+
+"""
+
+# ╔═╡ 4e44b9fe-3b41-4885-8c4d-ce7eeace2161
+begin
+	 u21,u22,u23,u24,u25=[2,0,-2],[-1, 0, 1],[1,3, 5],[3,5,7],[-1,1,3]
+	 matrix2=hcat(u21,u22,u23,u24,u25)
+	 latexify(matrix2)
+	
+end
+
+# ╔═╡ 2c193f17-4e1e-4f6c-8685-53b0f8d09eae
+begin
+	 rref_matrix2=rref(matrix2)  # 求简化阶梯型矩阵
+	 latexify(rref_matrix2)
+end
+
+# ╔═╡ b99b059a-df23-464d-9dbd-d3f14c7bfd32
+md"""
+主元列为 $u_1, u_3$ , 所以这一组向量张成一个$R^2$ ,$u_1, u_3$ 是 一组基, $u_2,u_3,u_5$ 为冗余向量
+"""
+
+# ╔═╡ 9204adc1-4d8d-4fe7-871c-a9894cb110d5
+md"""
+!!! example
+    example 4  齐次线性方程组解集空间的基
+
+    有下面齐次线性方程组:
+
+    $\left\{\begin{matrix}
+      x+y-z+3w-2v=0 \\
+      x+y+z-11w+8v=0 \\ 
+      4x+4y-3z+5w-3v=0
+     \end{matrix}\right.$
+
+    求一组解空间的基
+
+
+按照常规的齐次线性方程组的解法, 行化简找到主元列
+
+"""
+
+# ╔═╡ 38c187b2-3dfa-4063-bc4d-705ef03eb890
+begin
+	matrix3=[
+     1 1 -1 3 -2 0;
+	 1 1 1  -11 8 0;
+	 4 4 -3 5  -3 0
+	]
+	latexify(matrix3)
+end
+
+# ╔═╡ 82b3c5ee-ed13-474c-b826-7110ee00e2fe
+begin
+	rref_matrix3=rref(matrix3)  # 求简化阶梯型矩阵
+	latexify(rref_matrix3)
+end
+
+# ╔═╡ 1afed6c8-d273-4072-bfcc-020601e69215
+md"""
+ 从简化阶梯型矩阵可以看到主元是第 1,3 列,  第 2, 4, 5 是非主元列
+
+ 所以 $y, w, v$ 为自由变量  ,替换为$r,s,t$
+
+ 带入简化阶梯型
+"""
+
+# ╔═╡ 1eb45c43-e175-42ee-9636-fa2ff818daba
+begin
+ @variables r,s, t
+ vec_x=[x, r, z, s,t]
+ rref_matrix3[1,1:5]'*vec_x   # =0
+end
+
+# ╔═╡ 5ddf9d75-5b5b-4a6d-8018-2ccaba91e577
+ rref_matrix3[2,1:5]'*vec_x  # =0
+
+# ╔═╡ 66f1b93a-be81-42a4-a5a3-f048f3e01899
+md"""
+所以齐次方程的解表示为:
+
+$\left\{\begin{matrix}
+x=-r-3t+4s\\ 
+y=r\\ 
+z=-5t+7s    \\
+w=s\\
+v=t
+\end{matrix}\right.$
+
+
+表示为向量标量乘积形式
+
+$\begin{bmatrix}x\\y \\z \\w\\v\end{bmatrix}=r\begin{bmatrix}-1\\1 \\0 \\0\\0\end{bmatrix} +s\begin{bmatrix}4\\0 \\7 \\1\\0\end{bmatrix}+t\begin{bmatrix}-3\\0 \\-5 \\0\\1\end{bmatrix}$
+
+所以齐次线性方程组的解有三个向量扩张而成:
+
+$\left \{\begin{bmatrix}-1\\1 \\0 \\0\\0\end{bmatrix}, \begin{bmatrix}4\\0 \\7 \\1\\0\end{bmatrix},\begin{bmatrix}-3\\0 \\-5 \\0\\1\end{bmatrix} \right \}$
+
+"""
+
+# ╔═╡ 11fc25b6-39cc-42fc-be40-a814d76072e7
+md"""
+## 5.4.3 基和坐标系统
+
+假设 $V$ 为$R^n$ 的子空间,  生成 空间 $V$ 的一组基向量基本上和 $V$ 空间的一套坐标系统等同. 
+
+假设  $B=\left \{ u_1, u_2,\cdots,u_k \right \}$  表示$V$ 的一组基向量,也就是说$u_1, u_2,\cdots,u_k$ 是线性无关的一组向量.
+
+ $V$ 中每一个向量都可以表示为 基向量的线性组合形式 $v=a_1u_1+a_2u_2+\cdots+a_ku_k$,其中的系数组成 $a_1,a_2,\cdots,a_k$ 组成一个向量, 包含了如何形成 $v$ 的指令, 	$a_1,a_2,\cdots,a_k$ 就是向量$v$ 在 $V$ 中的坐标向量. 	
+
+
+这里需要注意的是特殊生成基, 就是标准向量基, 线性组合的系数组成的向量和组合后得到的向量形式一样. 要分清楚, 前者代表的是坐标指令, 而后者是向量.  后者是一个有尾巴和头部的向量. 前者只是坐标
+
+
+"""
+
+# ╔═╡ 43f201b7-1809-4536-b5b2-4ac6738cfecc
+begin
+	A5=diagm([1,1,1])  # 这是一组$R^3$ 的基向量, 而且是标准基
+	latexify(A5)   #
+end
+
+# ╔═╡ bcaecee8-61c5-437c-a00c-017e4c2a5356
+begin
+	x5=[1,2,3]  # 这是输入向量
+	latexify(x5)
+end
+
+# ╔═╡ 2527eabd-467c-493a-bd34-84d3824cf8f5
+begin
+	b5=A5*x5
+	latexify(b5)
+end
+
+# ╔═╡ 137fc7c2-d47f-49bf-9f0c-c4d12bf6b28b
+begin
+	@variables  x1,x2, x3
+	x6=[x1,x2,x3]
+	b6=A5*x6
+	latexify(b6)
+end
+
+# ╔═╡ 066b2586-7810-4389-ae43-d2bbf480e882
+md"""
+ $x5$ 的指令告诉矩阵, 沿着第一列向量移动一个单位, 沿着二列的方向移动 2 个点位, 沿着第三列的方向移动 3 个单位. 
+
+$\begin{bmatrix}1&0&0\\0&1&0\\0&0&1 \end{bmatrix} \begin{bmatrix}1\\2\\ 3\end{bmatrix}=1\begin{bmatrix}1\\0\\ 0\end{bmatrix}+2\begin{bmatrix}0\\1\\ 0\end{bmatrix}+3\begin{bmatrix}0\\0\\ 1\end{bmatrix}=\begin{bmatrix}1\\2\\ 3\end{bmatrix}$
+
+如果是非标准基, 那么方法一样, 但是指令和得到的向量可能不同, 需要理解坐标指令和最终获得的向量之间的区别和联系. 
+"""
+
+# ╔═╡ 2defeb3e-d78e-49c8-845a-67faf876f788
 md"""
 !!! example 
-    example 4  经过两点的直线
+    example 7 根据一组基向量和坐标向量求对应的向量
 
-    给定 $P=(1,2,0,1)$ 和向量$R=(2,-4,6,3)$ 求经过两点的直线方程
+    $[v]_B=\begin{bmatrix}1\\-1\\ 2\end{bmatrix}$
 
+    一组基为:
 
-在两个点中取任意一个点都可以, 然后确定方向向量$d$, 方向向量是两个向量的差
+    $u_1=\begin{bmatrix}1\\2\\ 1\end{bmatrix},u_2=\begin{bmatrix}0\\1\\ 0\end{bmatrix},u_3=\begin{bmatrix}-1\\0\\ 1\end{bmatrix}$
 
-$\vec{d}=\vec{R}-\vec{P}=\begin{bmatrix}2\\ -4\\ 6\\ 3\end{bmatrix}-\begin{bmatrix}1\\2 \\0 \\1 \end{bmatrix}=\begin{bmatrix}1\\-6 \\6 \\2 \end{bmatrix}$
-
-经过两点的直线上点的坐标向量可以表示为:
-
-
-$\begin{bmatrix}x\\y\\ z\\ w\end{bmatrix}=\begin{bmatrix}1\\2 \\0 \\1 \end{bmatrix}+t\begin{bmatrix}1\\-6 \\6 \\2 \end{bmatrix}$
-
-
- $n$ 维空间中经过两点直线上的点的坐标向量表示为:
-
-$$\begin{bmatrix}x_1\\x_2\\\vdots\\ x_n\end{bmatrix}=\begin{bmatrix}p_1\\p_2 \\ \vdots \\p_n\end{bmatrix}+t\begin{bmatrix}d_1\\d_2\\\vdots \\d_n \end{bmatrix}$$
+根据线性组合定义, 在$u_1$ 方向移动1 个单位,  在$u_2$ 方向移动-1 个单位, 在$u_3$ 方向移动2 个单位
 """
 
-# ╔═╡ b2a95afc-2f72-46b3-8159-c3b02229bfc7
-md"""
-
-
-!!! defintion
-
-    直线的参数方程
-
-    上述的坐标向量方法, 可以展开为参数方程组成的方程组, 实际我们在所有的描点法绘制图形时,使用的都是这中方法
-
-    $$\begin{bmatrix}x_1\\x_2\\\vdots\\ x_n\end{bmatrix}=\begin{bmatrix}p_1\\p_2 \\ \vdots \\p_n\end{bmatrix}+t\begin{bmatrix}d_1\\d_2\\\vdots \\d_n \end{bmatrix}$$
-
-$x_1=p_1+td_1$
-$x_2=p_2+td_2$
-$$\vdots$$
-$$x_n=p_n+td_n$$
-
-
-!!! example
-
-    example 5   给定 $P=(1,2,0,1)$ 和向量$R=(2,-4,6,3)$ 求经过两点的直线上点的参数方程
-
-
-$\begin{bmatrix}x\\y\\ z\\ w\end{bmatrix}=\begin{bmatrix}1\\2 \\0 \\1 \end{bmatrix}+t\begin{bmatrix}1\\-6 \\6 \\2 \end{bmatrix}$
-
-改写为:
-
-
-
-$$\begin{cases}
- x=1+t \\ 
- y=2-6t  \\ 
- z=6t\\ 
- w=1+2t
-\end{cases}$$
-   
-"""
-
-# ╔═╡ badc2be9-2483-40f5-af0c-6f3b1fa0cbe2
-md"""
-
-!!! example
-    example 6 一个点到直线的最短距离
-
-    假设直线$L$ 通过点$P=(0,4,-2)$,方向向量为$d=[2,1,2]'$, 直线外一点坐标为:$Q=(1,3,5)$ , 求$Q$ 到直线$L$ 的最短距离,以及直线上距离$Q$ 最近的点
-
-![](https://tva1.sinaimg.cn/orj360/e6c9d24egy1h3y3txnc5mj20ia08aaa6.jpg)
-
-
-实际要求 $Q$ 点在 直线上的投影, 首先要知道$\vec{PQ}$,等于头部减去尾部
-
-$\vec{PQ}=\begin{bmatrix}1\\3\\5\end{bmatrix}  -\begin{bmatrix}0\\4\\2\end{bmatrix}=\begin{bmatrix}1\\-1\\ 7\end{bmatrix}$
-
-向量$\vec{PQ}$ 在 直线上的投影表示为:
-
-$\vec{PR}=\frac{d \cdot \vec{PQ} }{||d||^2}d=\frac{5}{3}\begin{bmatrix}2\\1\\ 2\end{bmatrix}$
-
-
-$||RQ||$ 点到直线的距离等于 $||\vec{PQ}-\vec{PR}||$
-
-$||RQ||=||\vec{PQ}-\vec{PR}||=\sqrt{26}$
-
-
-$R$ 点的坐标向量为:
-
-$\begin{bmatrix}0\\4\\2\end{bmatrix}+\frac{5}{3}\begin{bmatrix}2\\1\\ 2\end{bmatrix}$
-
-
-
-
-"""
-
-# ╔═╡ 3d73b3bb-1d06-4c71-8930-ecf63eac65f5
+# ╔═╡ f03d9756-7296-4412-9061-56ec28e48a2a
 begin
-        store=Dict()
-    
-        function save(key::String, dict)
-            store[key]=dict
-        end
-        
-        function read(key::String)
-            return  store[key]
-        end
-	
-
-	    function vec_plot(v1,v2,ls=:solid)
-			v11,v12=v1[1],v1[2]
-			v21,v22=v2[1],v2[2]
-			return plot([v11,v21],[v12,v22],label=false, arrow=true, lw=2,ls=ls)
-		end
-
-	    function vec_plot!(v1,v2,ls=:solid)
-			v11,v12=v1[1],v1[2]
-			v21,v22=v2[1],v2[2]
-			return plot!([v11,v21],[v12,v22],label=false, arrow=true, lw=2,ls=ls)
-		end
-
-	    function vec_plot3d(v1,v2,ls=:solid)
-			v11,v12,v13=v1[1],v1[2],v1[3]
-			v21,v22,v23=v2[1],v2[2],v2[3]
-			return plot([v11,v21],[v12,v22],[v13,v23],label=false, lw=1,ls=ls)
-		end
-
-	    function vec_plot3d!(v1,v2,ls=:solid)
-			v11,v12,v13=v1[1],v1[2],v1[3]
-			v21,v22,v23=v2[1],v2[2],v2[3]
-			return plot!([v11,v21],[v12,v22],[v13,v23],label=false, lw=1,ls=ls)
-		end
-
-	    function dist(p,q)
-			length=size(p)
-			arr=[(abs(p[i]-q[i]))^2 for i in 1:length[1]]
-			return sqrt(sum(arr))
-		end
-
-
+	A7=[1 0 -1;2 1 0 ;1 0 1]
+	latexify(A7)
 end
 
-# ╔═╡ 605feda5-59f5-428d-a6f0-a30bcf697ecc
+# ╔═╡ 0551b24b-ba6b-4e08-8a1e-e4f7401c6537
+begin
+	x7=[1,-1,2]
+	latexify(x7)
+end
+
+# ╔═╡ e7f79bee-28e4-4940-a253-ac37a8689d90
+begin
+	b7=A7*x7
+	latexify(b7)
+	
+end
+
+# ╔═╡ 751e0141-c281-48d0-a12c-69987157c02e
 md"""
-在前面我们可以从一个点出发, 画出指向另个点的箭头, 第一个点作为尾部, 第二个点作为头部, 这就是向量. 只要方向相同, 或者相反, 我们可以画出无数个向量, 这些向量集合就可以用一条直线来表示 
 
-下面我们画出几个代表
+上面的$x7$  是指令,也就是在基向量下的坐标, 而$b7$  是生成的向量. 
 
- $(store["plotline"])
+可以这么说 $b7$  是属于 基向量张成的空间, 而$x7$ 并不是这个空间的向量. $x7$ 有自己的空间
 
- 给定两个向量, $u,v$, $d$ 表示从$u$ 到 $v$ 的方向.  这个向量是一个相对值, 加上第一个向量就代表向量在坐标系下的坐标.  给$d$ 倍乘任意实数表示沿着这个方向所有的向量, 包括相反方向的.
+用函数的观点, $x7$ 属于输入空间, 在定义域, $b7$ 属于输出空间,在值域, 而基向量组成的矩阵是一套映射规则
+"""
 
-```julia
+# ╔═╡ 5a247f12-8e3a-4d17-8b29-72c6526ce71d
+md"""
 
-  vec1,vec2=[1,1],[2,2]
+如果矩阵是可逆矩阵, 则给定一个$b$ 向量可以得到一个$x$ 向量, 如果矩阵是一组基, 那么得到的$x$ 向量 就是$b$ 向量 在基向量下的坐标向量
 
-  d= vec2-vec1
 
-  nvec(k)=vec1+k*d
-```
+!!! example 
 
-这里实现的实际是一条仿射直线, 我们在微积分中已经提到过.  从一个点出发, 给定一个方向向量, 在这条直线上的向量坐标都可以用如下公式来表示:
+    example 8 
 
-!!!  definition
+    求向量 $v=\begin{bmatrix}1\\2\\ 3\end{bmatrix}$
+    在一组基 
 
-     $p$ 为空间任意向量, $d$ 也是一个向量,两者结合可以表示一条通过两点的直线:
+    $u_1=\begin{bmatrix}1\\2\\ 1\end{bmatrix},u_2=\begin{bmatrix}0\\1\\ 0\end{bmatrix},u_3=\begin{bmatrix}-1\\0\\ 1\end{bmatrix}$
+    张成空间的坐标
 
-    $q=p+td$
 
-     $t \in R, d 称为方向向量$
-
-!!! notice
-
-    我们要在坐标系中画出一条直线,仅仅知道方向向量是不够得, 需要知道直线上每个点的坐标向量, 直线上每个点的坐标向量由任一点和方向向量执行加法得到. 
-
-    如图:
-
-   $(store["abline"])
-
-知道了方向向量$\vec{PR}, 坐标向量为: \vec{OP}+\vec{PR}=\vec{OR}$
-
-这个定义不仅仅在 二维和三维空间定义, 在$n$ 维空间同样也成立
+如果$v$ 在基张成的空间中, 则存在唯一的坐标向量, 指示如何组合成$v$ 向量. 所以我用常规的线性方程组求解
 
 """
 
-# ╔═╡ adcfdecb-bf60-45ef-9cd1-fcfefd14d03d
-let
-     kspan=-4:0.5:5
-     vec1,vec2=[1,1],[2,2]
-	 d= vec2-vec1
-	 nvec(k)=vec1+k*d
-     plotarr=[]
-     for (i,k) in enumerate(kspan)
-				if i==1
-					p=vec_plot(vec1,vec1+nvec(k))
-					push!(plotarr,p)
-				else
-					p=vec_plot!(vec1,vec1+nvec(k))
-					push!(plotarr,p)
-				end
-	 end
+# ╔═╡ e81d4aa4-513b-4546-82c3-3135a1073a97
+begin
+	augmentmatrix8=[1 0 -1 1; 2 1 0 2 ; 1 0 1 3]
+	latexify(augmentmatrix8)
+end
 
-	 line=plot!(plotarr... ,label=false,frame=:zerolines)
-	 scatter!([vec1[1],vec2[1]],[vec1[2],vec2[2]],ms=4,mc=:red)
-	 save("plotline",line)
+# ╔═╡ 5b621a51-2648-4b18-87cc-dd3304866f48
+begin
+	rref_m8=rref(augmentmatrix8)
+	latexify(rref_m8)
+end
+
+# ╔═╡ 5399fc9d-3625-4130-b78b-d5fac63f7809
+md"""
+所以方程组的解为:
+"""
+
+# ╔═╡ 09281c27-190c-4ea7-96de-49ca48003d5e
+begin
+	latexify(rref_m8[:,4])
+end
+
+# ╔═╡ e3c1933c-9f1d-4955-afac-e9d2fe429fb5
+md"""
+所以就得到了向量在这组基向量张成的空间中坐标
+"""
+
+# ╔═╡ 801d8dd1-e9ba-4586-b9ea-394c8f010997
+md"""
+## 5.4.4 维度
+
+关于生成基的一个重要特性是: 同一个空间的两套基的维度一定要相同. 
+
+!!! theorem
+
+    假设$V$ 是$R^n$ 空间的子空间, 	给定$B_1, B_2$ 是 $V$ 的两组基, 假定$B_1$ 包含有$s$ 个向量, $B_2$ 有$r$ 个向量则有$r==s$
+
+
+!!! definition
+
+    子空间和$R^n$ 空间的维度:
+
+    子空间的维度数量等于生成子空间基向量的数量.  $R^n$ 空间的标准基为$ \left \{ e_1, e_2,\cdots,e_n \right \}$ , 因为有$n$ 个基向量, 所以它的维度为$n$
+
+
+
+"""
+
+# ╔═╡ d06d8890-17f8-4710-95f2-9576e1067dfb
+md"""
+
+!!! example
+
+    example 8  子空间的维度
+
+    假定
+
+    $$V=\left \{\begin{bmatrix}x\\y \\z \end{bmatrix} \in R^3, | x-y+2z=0  \right \}$$
+
+     $V$ 的维度是多少?
+
+
+
+ $\begin{bmatrix}x\\y \\z \end{bmatrix}$ 是三元一次方程$x-y+2z=0$, 有三个未知数, 一个方程, 所有一个变量, 两个自由变量, 假设 $y=t, z=s$, 方程的通解可以写为:
+
+$\begin{bmatrix}x\\y \\z \end{bmatrix}=\begin{bmatrix}t-2s\\t \\s \end{bmatrix}=t\begin{bmatrix}1\\1\\0 \end{bmatrix}+s\begin{bmatrix}-2\\0 \\1 \end{bmatrix}$
+
+
+所以有:
+
+$V=span \left \{\begin{bmatrix}1\\1\\0 \end{bmatrix}, \begin{bmatrix}-2\\0 \\1 \end{bmatrix}\right \}$
+
+
+两个向量是无关的, 所以$V$ 的维度为$2$
+
+解空间的维度和自由变量的数量是一致的. 所以维度有时也称为自由度. 
+
+
+!!! example
+
+    example 9 
+    下面一组向量的维度为:
+
+    $W=\left \{\begin{bmatrix}1\\2\\-1\\1 \end{bmatrix}, \begin{bmatrix}1\\3\\-1\\1 \end{bmatrix},\begin{bmatrix}8\\19\\-8\\8 \end{bmatrix},\begin{bmatrix}-6\\-15\\6\\-6 \end{bmatrix},\begin{bmatrix}1\\3\\0\\1 \end{bmatrix},\begin{bmatrix}1\\5\\0\\1\end{bmatrix}\right \}$
+
+
+通过行变换, 看看主元的信息
+    
+"""
+
+# ╔═╡ 968c366c-6935-4463-a0fc-e6d463ff6918
+ begin
+	 u91,u92,u93,u94,u95,u96=[1,2,-1,1],[1,3,-1,1],[8,19,-8,8],[-6,-15,6,-6],[1,3,0,1],[1,5,0,1]
+	 matrix9=hcat(u91,u92,u93,u94,u95,u96)
+	 latexify(matrix9)
 
 end
 
-# ╔═╡ 290552bf-2b48-4900-9d9d-f0604ef805d8
-let
-     gr()
-     zero,vec1,vec2=[0,0],[1,3],[2,4]
-	 d= vec2-vec1
-	 nvec(k)=vec1+k*d
-     ann=[
-		 (0.5,2,text(L"\vec{OP}",pointsize=13,rotation=30)),
-		 (1.25,3.5,text(L"\vec{PR}",pointsize=13,rotation=10)),
-		 (1,1.5,text(L"\vec{OR}",pointsize=13,rotation=45)),
-		 (1,3.2,text(L"P",pointsize=13,rotation=10)),
-		  (2,4.2,text(L"R",pointsize=13,rotation=10))
-	 ]
-	plot([zero[1],vec2[1],vec1[1],zero[1]],[zero[2],vec2[2],vec1[2],zero[2]],label=false)
-	p1=scatter!([zero[1],vec2[1],vec1[1],zero[1]],[zero[2],vec2[2],vec1[2],zero[2]],label=false,ann=ann,frame=:semi)
-     
-    save("abline",p1)
+# ╔═╡ f6a211e6-54d0-42cb-8564-b98d2dfc7285
+begin
+ rref_matrix9=rref(matrix9)
+ latexify(rref_matrix9)
 end
+
+# ╔═╡ e4b44ee8-af36-43b9-9b6a-7fe0e4fdc52f
+md"""
+从简化阶梯矩阵可以看到, 主元列为: $1, 2, 5$,  冗余列为$3,4,6$,  因此$u_1,u_2,u_5$ 为$W$ 的一组生成基, 由于线性无关向量为$3$, 所以生成空间维度为$3$
+"""
+
+# ╔═╡ b304e9bf-218f-4a6b-b59b-4e099ac9cb33
+md"""
+## 5.4.5  更多维度和基的性质
+
+
+每一个$R^n$ 子空间都可以找到一组基向量
+
+一组线性无关向量可以扩展为一组基
+
+
+一组扩张向量集合如果去掉冗余向量就可以作为一个基
+
+"""
+
+# ╔═╡ 1a1d7b27-60d7-40f1-aca4-64d4a2442799
+@htl("""<script src="https://cdn.bootcdn.net/ajax/libs/mathjax/3.2.0/es5/tex-svg-full.min.js"></script>
+        """)
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
@@ -267,6 +462,7 @@ PLUTO_PROJECT_TOML_CONTENTS = """
 DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
 HypertextLiteral = "ac1192a8-f4b3-4bfe-ba22-af5b92cd3ab2"
 LaTeXStrings = "b964fa9f-0449-5b57-a5c2-d3ea65f4040f"
+Latexify = "23fbe1c1-3f47-55db-b15f-69d7ec21a316"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
 PlutoUI = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
@@ -277,6 +473,7 @@ Symbolics = "0c5d862f-8b57-4792-8d23-62f2024744c7"
 DataFrames = "~1.3.4"
 HypertextLiteral = "~0.9.4"
 LaTeXStrings = "~1.3.0"
+Latexify = "~0.15.15"
 Plots = "~1.31.1"
 PlutoUI = "~0.7.39"
 RowEchelon = "~0.2.1"
@@ -292,9 +489,9 @@ manifest_format = "2.0"
 
 [[deps.AbstractAlgebra]]
 deps = ["GroupsCore", "InteractiveUtils", "LinearAlgebra", "MacroTools", "Markdown", "Random", "RandomExtensions", "SparseArrays", "Test"]
-git-tree-sha1 = "dd2f52bc149ff35158827471453e2e4f1a2685a6"
+git-tree-sha1 = "5d984b08291a3f99891f48007d244221182200cc"
 uuid = "c3fe647b-3220-5bb0-a1ea-a7954cac585d"
-version = "0.26.0"
+version = "0.26.2"
 
 [[deps.AbstractPlutoDingetjes]]
 deps = ["Pkg"]
@@ -537,9 +734,9 @@ uuid = "8ba89e20-285c-5b6f-9357-94700520ee1b"
 
 [[deps.Distributions]]
 deps = ["ChainRulesCore", "DensityInterface", "FillArrays", "LinearAlgebra", "PDMats", "Printf", "QuadGK", "Random", "SparseArrays", "SpecialFunctions", "Statistics", "StatsBase", "StatsFuns", "Test"]
-git-tree-sha1 = "d530092b57aef8b96b27694e51c575b09c7f0b2e"
+git-tree-sha1 = "429077fd74119f5ac495857fd51f4120baf36355"
 uuid = "31c24e10-a181-5473-b8eb-7969acd0382f"
-version = "0.25.64"
+version = "0.25.65"
 
 [[deps.DocStringExtensions]]
 deps = ["LibGit2"]
@@ -664,9 +861,9 @@ version = "0.64.4"
 
 [[deps.GR_jll]]
 deps = ["Artifacts", "Bzip2_jll", "Cairo_jll", "FFMPEG_jll", "Fontconfig_jll", "GLFW_jll", "JLLWrappers", "JpegTurbo_jll", "Libdl", "Libtiff_jll", "Pixman_jll", "Pkg", "Qt5Base_jll", "Zlib_jll", "libpng_jll"]
-git-tree-sha1 = "3a233eeeb2ca45842fe100e0413936834215abf5"
+git-tree-sha1 = "067fecedcecb6a923bc0227bf0a989175ef9565c"
 uuid = "d2c73de3-f751-5644-a686-071e5b155ba9"
-version = "0.64.4+0"
+version = "0.65.1+0"
 
 [[deps.GeometryBasics]]
 deps = ["EarCut_jll", "IterTools", "LinearAlgebra", "StaticArrays", "StructArrays", "Tables"]
@@ -1019,9 +1216,9 @@ uuid = "05823500-19ac-5b8b-9628-191a04bc5112"
 
 [[deps.OpenSSL_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
-git-tree-sha1 = "9a36165cf84cff35851809a40a928e1103702013"
+git-tree-sha1 = "e60321e3f2616584ff98f0a4f18d98ae6f89bbb3"
 uuid = "458c3c95-2e84-50aa-8efc-19380b2a3a95"
-version = "1.1.16+0"
+version = "1.1.17+0"
 
 [[deps.OpenSpecFun_jll]]
 deps = ["Artifacts", "CompilerSupportLibraries_jll", "JLLWrappers", "Libdl", "Pkg"]
@@ -1048,9 +1245,9 @@ version = "8.44.0+0"
 
 [[deps.PDMats]]
 deps = ["LinearAlgebra", "SparseArrays", "SuiteSparse"]
-git-tree-sha1 = "ca433b9e2f5ca3a0ce6702a032fce95a3b6e1e48"
+git-tree-sha1 = "cf494dca75a69712a72b80bc48f59dcf3dea63ec"
 uuid = "90014a1f-27ba-587c-ab20-58faa44d9150"
-version = "0.11.14"
+version = "0.11.16"
 
 [[deps.Parameters]]
 deps = ["OrderedCollections", "UnPack"]
@@ -1171,9 +1368,9 @@ version = "0.5.2"
 
 [[deps.RecursiveArrayTools]]
 deps = ["Adapt", "ArrayInterfaceCore", "ArrayInterfaceStaticArraysCore", "ChainRulesCore", "DocStringExtensions", "FillArrays", "GPUArraysCore", "LinearAlgebra", "RecipesBase", "StaticArraysCore", "Statistics", "ZygoteRules"]
-git-tree-sha1 = "7ddd4f1ac52f9cc1b784212785f86a75602a7e4b"
+git-tree-sha1 = "7a5f08bdeb79cf3f8ce60125fe1b2a04041c1d26"
 uuid = "731186ca-8d62-57ce-b412-fbd966d074cd"
-version = "2.31.0"
+version = "2.31.1"
 
 [[deps.Reexport]]
 git-tree-sha1 = "45e428421666073eab6f2da5c9d310d99bb12f9b"
@@ -1332,9 +1529,9 @@ uuid = "4607b0f0-06f3-5cda-b6b1-a6196a1729e9"
 
 [[deps.SymbolicUtils]]
 deps = ["AbstractTrees", "Bijections", "ChainRulesCore", "Combinatorics", "ConstructionBase", "DataStructures", "DocStringExtensions", "DynamicPolynomials", "IfElse", "LabelledArrays", "LinearAlgebra", "Metatheory", "MultivariatePolynomials", "NaNMath", "Setfield", "SparseArrays", "SpecialFunctions", "StaticArrays", "TermInterface", "TimerOutputs"]
-git-tree-sha1 = "92b21f756625f2ff3b2a05495c105f432be01e17"
+git-tree-sha1 = "027b43d312f6d52187bb16c2d4f0588ddb8c4bb2"
 uuid = "d1185830-fcd6-423d-90d6-eec64667417b"
-version = "0.19.10"
+version = "0.19.11"
 
 [[deps.Symbolics]]
 deps = ["ArrayInterfaceCore", "ConstructionBase", "DataStructures", "DiffRules", "Distributions", "DocStringExtensions", "DomainSets", "Groebner", "IfElse", "Latexify", "Libdl", "LinearAlgebra", "MacroTools", "Metatheory", "NaNMath", "RecipesBase", "Reexport", "Requires", "RuntimeGeneratedFunctions", "SciMLBase", "Setfield", "SparseArrays", "SpecialFunctions", "StaticArrays", "SymbolicUtils", "TermInterface", "TreeViews"]
@@ -1656,15 +1853,49 @@ version = "0.9.1+5"
 """
 
 # ╔═╡ Cell order:
-# ╟─5fff0cf2-6d56-4ee0-ac45-f6c6e0e39a6a
-# ╟─e2024006-fcfd-11ec-1b29-41546d0924f1
-# ╟─1c0176b7-931e-499a-9d56-239cfba7e9f2
-# ╠═605feda5-59f5-428d-a6f0-a30bcf697ecc
-# ╠═adcfdecb-bf60-45ef-9cd1-fcfefd14d03d
-# ╠═290552bf-2b48-4900-9d9d-f0604ef805d8
-# ╠═ad07c025-633f-4ae2-995e-27641764873a
-# ╠═b2a95afc-2f72-46b3-8159-c3b02229bfc7
-# ╠═badc2be9-2483-40f5-af0c-6f3b1fa0cbe2
-# ╠═3d73b3bb-1d06-4c71-8930-ecf63eac65f5
+# ╟─78ba4a3c-9db9-4633-bfd3-a62ba5f92759
+# ╟─17b89e58-001d-11ed-2248-9b3e5bdd29e9
+# ╠═22bb9dba-0b50-473c-9827-f964bdf180f7
+# ╠═a4e6fd65-f169-42f9-a46e-4237d4607879
+# ╠═226ff11b-9698-422d-828b-c7251ba95ca1
+# ╠═f933be0b-c0da-4fe0-b94c-c53cd3df7120
+# ╠═f0bf2b82-6a5f-49ed-9410-e246ca1fc25b
+# ╠═47ec0e91-624b-479b-b80c-a5a7700342cc
+# ╠═3571cbd1-9e22-4c13-bd25-97b1e52eee5e
+# ╠═bb944052-96e7-4244-81d9-194fe3b703dc
+# ╠═4e44b9fe-3b41-4885-8c4d-ce7eeace2161
+# ╠═2c193f17-4e1e-4f6c-8685-53b0f8d09eae
+# ╠═b99b059a-df23-464d-9dbd-d3f14c7bfd32
+# ╠═9204adc1-4d8d-4fe7-871c-a9894cb110d5
+# ╠═38c187b2-3dfa-4063-bc4d-705ef03eb890
+# ╠═82b3c5ee-ed13-474c-b826-7110ee00e2fe
+# ╠═1afed6c8-d273-4072-bfcc-020601e69215
+# ╠═1eb45c43-e175-42ee-9636-fa2ff818daba
+# ╠═5ddf9d75-5b5b-4a6d-8018-2ccaba91e577
+# ╠═66f1b93a-be81-42a4-a5a3-f048f3e01899
+# ╠═11fc25b6-39cc-42fc-be40-a814d76072e7
+# ╠═43f201b7-1809-4536-b5b2-4ac6738cfecc
+# ╠═bcaecee8-61c5-437c-a00c-017e4c2a5356
+# ╠═2527eabd-467c-493a-bd34-84d3824cf8f5
+# ╠═137fc7c2-d47f-49bf-9f0c-c4d12bf6b28b
+# ╠═066b2586-7810-4389-ae43-d2bbf480e882
+# ╠═2defeb3e-d78e-49c8-845a-67faf876f788
+# ╠═f03d9756-7296-4412-9061-56ec28e48a2a
+# ╠═0551b24b-ba6b-4e08-8a1e-e4f7401c6537
+# ╠═e7f79bee-28e4-4940-a253-ac37a8689d90
+# ╠═751e0141-c281-48d0-a12c-69987157c02e
+# ╠═5a247f12-8e3a-4d17-8b29-72c6526ce71d
+# ╠═e81d4aa4-513b-4546-82c3-3135a1073a97
+# ╠═5b621a51-2648-4b18-87cc-dd3304866f48
+# ╠═5399fc9d-3625-4130-b78b-d5fac63f7809
+# ╟─09281c27-190c-4ea7-96de-49ca48003d5e
+# ╠═e3c1933c-9f1d-4955-afac-e9d2fe429fb5
+# ╠═801d8dd1-e9ba-4586-b9ea-394c8f010997
+# ╠═d06d8890-17f8-4710-95f2-9576e1067dfb
+# ╠═968c366c-6935-4463-a0fc-e6d463ff6918
+# ╠═f6a211e6-54d0-42cb-8564-b98d2dfc7285
+# ╠═e4b44ee8-af36-43b9-9b6a-7fe0e4fdc52f
+# ╠═b304e9bf-218f-4a6b-b59b-4e099ac9cb33
+# ╟─1a1d7b27-60d7-40f1-aca4-64d4a2442799
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002

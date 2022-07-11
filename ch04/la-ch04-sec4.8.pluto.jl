@@ -4,9 +4,10 @@
 using Markdown
 using InteractiveUtils
 
-# ╔═╡ e2024006-fcfd-11ec-1b29-41546d0924f1
+# ╔═╡ e018b2cc-ff1f-11ec-116a-132e9616087e
 begin
-        using PlutoUI, Plots,DataFrames,HypertextLiteral,LaTeXStrings,Symbolics,LinearAlgebra,RowEchelon
+        using PlutoUI, Plots,DataFrames,HypertextLiteral,LaTeXStrings,Symbolics,LinearAlgebra
+	    
         gr()
         theme(:bright)
         @htl("""<script src="https://cdn.bootcdn.net/ajax/libs/mathjax/3.2.0/es5/tex-svg-full.min.js"></script>
@@ -14,252 +15,143 @@ begin
         PlutoUI.TableOfContents()
  end
 
-# ╔═╡ 5fff0cf2-6d56-4ee0-ac45-f6c6e0e39a6a
+# ╔═╡ 6f894aa9-1869-4671-a289-4acd43c2c2e3
 PlutoUI.Resource("https://tva1.sinaimg.cn/thumbnail/e6c9d24egy1h2alsw1tzxj20m80gomxn.jpg")
 
 
-# ╔═╡ 1c0176b7-931e-499a-9d56-239cfba7e9f2
+# ╔═╡ 1b93efbd-4fcd-4563-9024-940d0c58617a
 md"""
-# ch03 sec3.1 直线
+# ch04  sec4.8 矩阵应用-密码
 
-!!! outcomes
+密码学就是把一个信息编码成为难以被理解的内容,  其实这$100%$ 符合函数的定义的三个要素. 我们有一条信息, 然后通过一个规则映射为一条难以理解的信息. 密码破译实际就是要找到这个规则. 
 
-    - A.求直线的向量, 参数和对称方程
+输入的信息称为明文(plain text), 输出的信息称为密文(ciphertext), 加密过程称为编码(encode), 解密过程称为解码(decode)
 
-    - B.判断一个点是否在一条给定直线上
+下面看看这个简单的实例
 
-    - C.判断两条直线是否相交
+密码编码和解码实际和查字典一样, 明文和密文在字典里有一一对应的关系, 用字典数据结构编码很方方便
 
-    - D.求两条之间之间的夹角
 
-    - E. 求一个点在直线上的投影
-"""
-
-# ╔═╡ ad07c025-633f-4ae2-995e-27641764873a
-md"""
-!!! example 
-    example 4  经过两点的直线
-
-    给定 $P=(1,2,0,1)$ 和向量$R=(2,-4,6,3)$ 求经过两点的直线方程
-
-
-在两个点中取任意一个点都可以, 然后确定方向向量$d$, 方向向量是两个向量的差
-
-$\vec{d}=\vec{R}-\vec{P}=\begin{bmatrix}2\\ -4\\ 6\\ 3\end{bmatrix}-\begin{bmatrix}1\\2 \\0 \\1 \end{bmatrix}=\begin{bmatrix}1\\-6 \\6 \\2 \end{bmatrix}$
-
-经过两点的直线上点的坐标向量可以表示为:
-
-
-$\begin{bmatrix}x\\y\\ z\\ w\end{bmatrix}=\begin{bmatrix}1\\2 \\0 \\1 \end{bmatrix}+t\begin{bmatrix}1\\-6 \\6 \\2 \end{bmatrix}$
-
-
- $n$ 维空间中经过两点直线上的点的坐标向量表示为:
-
-$$\begin{bmatrix}x_1\\x_2\\\vdots\\ x_n\end{bmatrix}=\begin{bmatrix}p_1\\p_2 \\ \vdots \\p_n\end{bmatrix}+t\begin{bmatrix}d_1\\d_2\\\vdots \\d_n \end{bmatrix}$$
-"""
-
-# ╔═╡ b2a95afc-2f72-46b3-8159-c3b02229bfc7
-md"""
-
-
-!!! defintion
-
-    直线的参数方程
-
-    上述的坐标向量方法, 可以展开为参数方程组成的方程组, 实际我们在所有的描点法绘制图形时,使用的都是这中方法
-
-    $$\begin{bmatrix}x_1\\x_2\\\vdots\\ x_n\end{bmatrix}=\begin{bmatrix}p_1\\p_2 \\ \vdots \\p_n\end{bmatrix}+t\begin{bmatrix}d_1\\d_2\\\vdots \\d_n \end{bmatrix}$$
-
-$x_1=p_1+td_1$
-$x_2=p_2+td_2$
-$$\vdots$$
-$$x_n=p_n+td_n$$
-
-
-!!! example
-
-    example 5   给定 $P=(1,2,0,1)$ 和向量$R=(2,-4,6,3)$ 求经过两点的直线上点的参数方程
-
-
-$\begin{bmatrix}x\\y\\ z\\ w\end{bmatrix}=\begin{bmatrix}1\\2 \\0 \\1 \end{bmatrix}+t\begin{bmatrix}1\\-6 \\6 \\2 \end{bmatrix}$
-
-改写为:
-
-
-
-$$\begin{cases}
- x=1+t \\ 
- y=2-6t  \\ 
- z=6t\\ 
- w=1+2t
-\end{cases}$$
-   
-"""
-
-# ╔═╡ badc2be9-2483-40f5-af0c-6f3b1fa0cbe2
-md"""
-
-!!! example
-    example 6 一个点到直线的最短距离
-
-    假设直线$L$ 通过点$P=(0,4,-2)$,方向向量为$d=[2,1,2]'$, 直线外一点坐标为:$Q=(1,3,5)$ , 求$Q$ 到直线$L$ 的最短距离,以及直线上距离$Q$ 最近的点
-
-![](https://tva1.sinaimg.cn/orj360/e6c9d24egy1h3y3txnc5mj20ia08aaa6.jpg)
-
-
-实际要求 $Q$ 点在 直线上的投影, 首先要知道$\vec{PQ}$,等于头部减去尾部
-
-$\vec{PQ}=\begin{bmatrix}1\\3\\5\end{bmatrix}  -\begin{bmatrix}0\\4\\2\end{bmatrix}=\begin{bmatrix}1\\-1\\ 7\end{bmatrix}$
-
-向量$\vec{PQ}$ 在 直线上的投影表示为:
-
-$\vec{PR}=\frac{d \cdot \vec{PQ} }{||d||^2}d=\frac{5}{3}\begin{bmatrix}2\\1\\ 2\end{bmatrix}$
-
-
-$||RQ||$ 点到直线的距离等于 $||\vec{PQ}-\vec{PR}||$
-
-$||RQ||=||\vec{PQ}-\vec{PR}||=\sqrt{26}$
-
-
-$R$ 点的坐标向量为:
-
-$\begin{bmatrix}0\\4\\2\end{bmatrix}+\frac{5}{3}\begin{bmatrix}2\\1\\ 2\end{bmatrix}$
-
-
-
-
-"""
-
-# ╔═╡ 3d73b3bb-1d06-4c71-8930-ecf63eac65f5
-begin
-        store=Dict()
-    
-        function save(key::String, dict)
-            store[key]=dict
-        end
-        
-        function read(key::String)
-            return  store[key]
-        end
-	
-
-	    function vec_plot(v1,v2,ls=:solid)
-			v11,v12=v1[1],v1[2]
-			v21,v22=v2[1],v2[2]
-			return plot([v11,v21],[v12,v22],label=false, arrow=true, lw=2,ls=ls)
-		end
-
-	    function vec_plot!(v1,v2,ls=:solid)
-			v11,v12=v1[1],v1[2]
-			v21,v22=v2[1],v2[2]
-			return plot!([v11,v21],[v12,v22],label=false, arrow=true, lw=2,ls=ls)
-		end
-
-	    function vec_plot3d(v1,v2,ls=:solid)
-			v11,v12,v13=v1[1],v1[2],v1[3]
-			v21,v22,v23=v2[1],v2[2],v2[3]
-			return plot([v11,v21],[v12,v22],[v13,v23],label=false, lw=1,ls=ls)
-		end
-
-	    function vec_plot3d!(v1,v2,ls=:solid)
-			v11,v12,v13=v1[1],v1[2],v1[3]
-			v21,v22,v23=v2[1],v2[2],v2[3]
-			return plot!([v11,v21],[v12,v22],[v13,v23],label=false, lw=1,ls=ls)
-		end
-
-	    function dist(p,q)
-			length=size(p)
-			arr=[(abs(p[i]-q[i]))^2 for i in 1:length[1]]
-			return sqrt(sum(arr))
-		end
-
-
-end
-
-# ╔═╡ 605feda5-59f5-428d-a6f0-a30bcf697ecc
-md"""
-在前面我们可以从一个点出发, 画出指向另个点的箭头, 第一个点作为尾部, 第二个点作为头部, 这就是向量. 只要方向相同, 或者相反, 我们可以画出无数个向量, 这些向量集合就可以用一条直线来表示 
-
-下面我们画出几个代表
-
- $(store["plotline"])
-
- 给定两个向量, $u,v$, $d$ 表示从$u$ 到 $v$ 的方向.  这个向量是一个相对值, 加上第一个向量就代表向量在坐标系下的坐标.  给$d$ 倍乘任意实数表示沿着这个方向所有的向量, 包括相反方向的.
-
-```julia
-
-  vec1,vec2=[1,1],[2,2]
-
-  d= vec2-vec1
-
-  nvec(k)=vec1+k*d
+```
+  encodeDict=Dict("明文"=>"密码")
+  decodeDict=Dict("密码"=>"明文")
 ```
 
-这里实现的实际是一条仿射直线, 我们在微积分中已经提到过.  从一个点出发, 给定一个方向向量, 在这条直线上的向量坐标都可以用如下公式来表示:
+1. 定义密码字典 代码  点击 右上角 密码字典定义查看
 
-!!!  definition
+2. 编码 :拿到一个明文通过 encodeDict 查找对应的密码
 
-     $p$ 为空间任意向量, $d$ 也是一个向量,两者结合可以表示一条通过两点的直线:
-
-    $q=p+td$
-
-     $t \in R, d 称为方向向量$
-
-!!! notice
-
-    我们要在坐标系中画出一条直线,仅仅知道方向向量是不够得, 需要知道直线上每个点的坐标向量, 直线上每个点的坐标向量由任一点和方向向量执行加法得到. 
-
-    如图:
-
-   $(store["abline"])
-
-知道了方向向量$\vec{PR}, 坐标向量为: \vec{OP}+\vec{PR}=\vec{OR}$
-
-这个定义不仅仅在 二维和三维空间定义, 在$n$ 维空间同样也成立
+3. 解码 :拿到一个密文通过 decodeDict 查找对应的明文
 
 """
 
-# ╔═╡ adcfdecb-bf60-45ef-9cd1-fcfefd14d03d
-let
-     kspan=-4:0.5:5
-     vec1,vec2=[1,1],[2,2]
-	 d= vec2-vec1
-	 nvec(k)=vec1+k*d
-     plotarr=[]
-     for (i,k) in enumerate(kspan)
-				if i==1
-					p=vec_plot(vec1,vec1+nvec(k))
-					push!(plotarr,p)
-				else
-					p=vec_plot!(vec1,vec1+nvec(k))
-					push!(plotarr,p)
-				end
-	 end
+# ╔═╡ 3e727843-8090-4db3-8b0d-51584ab8d7bf
+ str=["a","t","t","a","c","k","a","t","d","a","w","n"]
 
-	 line=plot!(plotarr... ,label=false,frame=:zerolines)
-	 scatter!([vec1[1],vec2[1]],[vec1[2],vec2[2]],ms=4,mc=:red)
-	 save("plotline",line)
+# ╔═╡ eb919771-4a2f-40ed-adfb-8ec438067d1f
+helloworld=["h","e","l","l","o","!","w","o","r","l","d"]
 
+# ╔═╡ 1133c533-25f5-49f9-8d6f-1f6d656315b4
+md"## 密码字典定义"
+
+# ╔═╡ a8a0c81a-96ae-4048-a1a5-592ee3ee8fe6
+begin
+	marks=Dict(
+		"space"=> "0",
+
+		"comma"=> "27",
+
+		"period"=> "28",
+		"!"=> "29"
+	)
+
+	words = Dict(
+        "a" => "1", 
+        "b" => "2", 
+        "c" => "3", 
+        "d" => "4", 
+        "e" => "5", 
+        "f" => "6", 
+        "g" => "7", 
+        "h" => "8", 
+        "i" => "9", 
+        "j" => "10", 
+        "k" => "11", 
+        "l" => "12", 
+        "m" => "13", 
+        "n" => "14", 
+        "o" => "15", 
+        "p" => "16", 
+        "q" => "17", 
+        "r" => "18", 
+        "s" => "19", 
+        "t" => "20", 
+        "u" => "21", 
+        "v" => "22", 
+        "w" => "23", 
+        "x" => "24", 
+        "y" => "25", 
+        "z" => "26"
+)
+
+  alphabetDict=merge!(marks,words)
+  stringDict=Dict()
+   numberDict=Dict()
+	
+   for (i,key) in enumerate(keys(alphabetDict))
+		
+			stringDict[key]=i
+		    numberDict[i]=key
+   end
 end
 
-# ╔═╡ 290552bf-2b48-4900-9d9d-f0604ef805d8
-let
-     gr()
-     zero,vec1,vec2=[0,0],[1,3],[2,4]
-	 d= vec2-vec1
-	 nvec(k)=vec1+k*d
-     ann=[
-		 (0.5,2,text(L"\vec{OP}",pointsize=13,rotation=30)),
-		 (1.25,3.5,text(L"\vec{PR}",pointsize=13,rotation=10)),
-		 (1,1.5,text(L"\vec{OR}",pointsize=13,rotation=45)),
-		 (1,3.2,text(L"P",pointsize=13,rotation=10)),
-		  (2,4.2,text(L"R",pointsize=13,rotation=10))
-	 ]
-	plot([zero[1],vec2[1],vec1[1],zero[1]],[zero[2],vec2[2],vec1[2],zero[2]],label=false)
-	p1=scatter!([zero[1],vec2[1],vec1[1],zero[1]],[zero[2],vec2[2],vec1[2],zero[2]],label=false,ann=ann,frame=:semi)
-     
-    save("abline",p1)
+# ╔═╡ 407f72d9-ea00-4955-8cbf-d1371e5f2498
+begin
+
+   # 加密函数, stringDict 的意思是通过字符编码为数字
+   function  encode(str)
+	     code=[]
+	     num=length(str)
+
+	     for  i in 1:num
+             word=str[i]
+			 push!(code,stringDict[word])
+
+		 end
+	    
+	    return code
+  end
+
+
+  # 加密函数, numberDict  的意思是通过数字查找字符
+   function decode(num)
+
+		 code=[]
+         numbers=length(num)
+		 for  i in 1:numbers
+             index=num[i]
+			 push!(code,numberDict[index])
+
+		 end
+         return  code
+	end
+
 end
+        
+      
+
+# ╔═╡ a485bedb-a909-4393-968d-3e53cdba990b
+encry_code=encode(str)
+
+# ╔═╡ d2b8e214-f127-441a-8242-4c98c16facfd
+decode(encry_code)
+
+
+# ╔═╡ 5aeb6b9e-f73a-44d4-969b-ca03de5c638e
+receive_code=encode(helloworld)
+
+# ╔═╡ 40b01008-64f3-4ded-b8fa-cb8e8ea1dabb
+decode(receive_code)
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
@@ -270,7 +162,6 @@ LaTeXStrings = "b964fa9f-0449-5b57-a5c2-d3ea65f4040f"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
 PlutoUI = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
-RowEchelon = "af85af4c-bcd5-5d23-b03a-a909639aa875"
 Symbolics = "0c5d862f-8b57-4792-8d23-62f2024744c7"
 
 [compat]
@@ -279,7 +170,6 @@ HypertextLiteral = "~0.9.4"
 LaTeXStrings = "~1.3.0"
 Plots = "~1.31.1"
 PlutoUI = "~0.7.39"
-RowEchelon = "~0.2.1"
 Symbolics = "~4.8.3"
 """
 
@@ -292,9 +182,9 @@ manifest_format = "2.0"
 
 [[deps.AbstractAlgebra]]
 deps = ["GroupsCore", "InteractiveUtils", "LinearAlgebra", "MacroTools", "Markdown", "Random", "RandomExtensions", "SparseArrays", "Test"]
-git-tree-sha1 = "dd2f52bc149ff35158827471453e2e4f1a2685a6"
+git-tree-sha1 = "41b4d4377ddb09cb8e6acd723b75940231621704"
 uuid = "c3fe647b-3220-5bb0-a1ea-a7954cac585d"
-version = "0.26.0"
+version = "0.26.1"
 
 [[deps.AbstractPlutoDingetjes]]
 deps = ["Pkg"]
@@ -469,9 +359,10 @@ uuid = "187b0558-2788-49d3-abe0-74a17ed4e7c9"
 version = "1.4.0"
 
 [[deps.Contour]]
-git-tree-sha1 = "a599cfb8b1909b0f97c5e1b923ab92e1c0406076"
+deps = ["StaticArrays"]
+git-tree-sha1 = "9f02045d934dc030edad45944ea80dbd1f0ebea7"
 uuid = "d38c429a-6771-53c6-b99e-75d170b6e991"
-version = "0.6.1"
+version = "0.5.7"
 
 [[deps.Crayons]]
 git-tree-sha1 = "249fe38abf76d48563e2f4556bebd215aa317e15"
@@ -1048,9 +939,9 @@ version = "8.44.0+0"
 
 [[deps.PDMats]]
 deps = ["LinearAlgebra", "SparseArrays", "SuiteSparse"]
-git-tree-sha1 = "ca433b9e2f5ca3a0ce6702a032fce95a3b6e1e48"
+git-tree-sha1 = "9351c1a6c0e922cc862bd96822a98c9029a6d142"
 uuid = "90014a1f-27ba-587c-ab20-58faa44d9150"
-version = "0.11.14"
+version = "0.11.15"
 
 [[deps.Parameters]]
 deps = ["OrderedCollections", "UnPack"]
@@ -1210,12 +1101,6 @@ git-tree-sha1 = "68db32dff12bb6127bac73c209881191bf0efbb7"
 uuid = "f50d1b31-88e8-58de-be2c-1cc44531875f"
 version = "0.3.0+0"
 
-[[deps.RowEchelon]]
-deps = ["LinearAlgebra"]
-git-tree-sha1 = "f479526c4f6efcbf01e7a8f4223d62cfe801c974"
-uuid = "af85af4c-bcd5-5d23-b03a-a909639aa875"
-version = "0.2.1"
-
 [[deps.RuntimeGeneratedFunctions]]
 deps = ["ExprTools", "SHA", "Serialization"]
 git-tree-sha1 = "cdc1e4278e91a6ad530770ebb327f9ed83cf10c4"
@@ -1332,9 +1217,9 @@ uuid = "4607b0f0-06f3-5cda-b6b1-a6196a1729e9"
 
 [[deps.SymbolicUtils]]
 deps = ["AbstractTrees", "Bijections", "ChainRulesCore", "Combinatorics", "ConstructionBase", "DataStructures", "DocStringExtensions", "DynamicPolynomials", "IfElse", "LabelledArrays", "LinearAlgebra", "Metatheory", "MultivariatePolynomials", "NaNMath", "Setfield", "SparseArrays", "SpecialFunctions", "StaticArrays", "TermInterface", "TimerOutputs"]
-git-tree-sha1 = "92b21f756625f2ff3b2a05495c105f432be01e17"
+git-tree-sha1 = "027b43d312f6d52187bb16c2d4f0588ddb8c4bb2"
 uuid = "d1185830-fcd6-423d-90d6-eec64667417b"
-version = "0.19.10"
+version = "0.19.11"
 
 [[deps.Symbolics]]
 deps = ["ArrayInterfaceCore", "ConstructionBase", "DataStructures", "DiffRules", "Distributions", "DocStringExtensions", "DomainSets", "Groebner", "IfElse", "Latexify", "Libdl", "LinearAlgebra", "MacroTools", "Metatheory", "NaNMath", "RecipesBase", "Reexport", "Requires", "RuntimeGeneratedFunctions", "SciMLBase", "Setfield", "SparseArrays", "SpecialFunctions", "StaticArrays", "SymbolicUtils", "TermInterface", "TreeViews"]
@@ -1656,15 +1541,17 @@ version = "0.9.1+5"
 """
 
 # ╔═╡ Cell order:
-# ╟─5fff0cf2-6d56-4ee0-ac45-f6c6e0e39a6a
-# ╟─e2024006-fcfd-11ec-1b29-41546d0924f1
-# ╟─1c0176b7-931e-499a-9d56-239cfba7e9f2
-# ╠═605feda5-59f5-428d-a6f0-a30bcf697ecc
-# ╠═adcfdecb-bf60-45ef-9cd1-fcfefd14d03d
-# ╠═290552bf-2b48-4900-9d9d-f0604ef805d8
-# ╠═ad07c025-633f-4ae2-995e-27641764873a
-# ╠═b2a95afc-2f72-46b3-8159-c3b02229bfc7
-# ╠═badc2be9-2483-40f5-af0c-6f3b1fa0cbe2
-# ╠═3d73b3bb-1d06-4c71-8930-ecf63eac65f5
+# ╟─6f894aa9-1869-4671-a289-4acd43c2c2e3
+# ╟─e018b2cc-ff1f-11ec-116a-132e9616087e
+# ╠═1b93efbd-4fcd-4563-9024-940d0c58617a
+# ╠═407f72d9-ea00-4955-8cbf-d1371e5f2498
+# ╠═3e727843-8090-4db3-8b0d-51584ab8d7bf
+# ╠═a485bedb-a909-4393-968d-3e53cdba990b
+# ╠═d2b8e214-f127-441a-8242-4c98c16facfd
+# ╠═eb919771-4a2f-40ed-adfb-8ec438067d1f
+# ╠═5aeb6b9e-f73a-44d4-969b-ca03de5c638e
+# ╠═40b01008-64f3-4ded-b8fa-cb8e8ea1dabb
+# ╠═1133c533-25f5-49f9-8d6f-1f6d656315b4
+# ╠═a8a0c81a-96ae-4048-a1a5-592ee3ee8fe6
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
