@@ -4,262 +4,205 @@
 using Markdown
 using InteractiveUtils
 
-# ╔═╡ e2024006-fcfd-11ec-1b29-41546d0924f1
+# ╔═╡ 10c6f24a-00b1-11ed-3cf1-4bb5e31575e1
 begin
-        using PlutoUI, Plots,DataFrames,HypertextLiteral,LaTeXStrings,Symbolics,LinearAlgebra,RowEchelon
+        using PlutoUI, Plots,DataFrames,HypertextLiteral,LaTeXStrings,Symbolics,LinearAlgebra,RowEchelon,Latexify
         gr()
         theme(:bright)
-        @htl("""<script src="https://cdn.bootcdn.net/ajax/libs/mathjax/3.2.0/es5/tex-svg-full.min.js"></script>
-        """)
+       
         PlutoUI.TableOfContents()
  end
 
-# ╔═╡ 5fff0cf2-6d56-4ee0-ac45-f6c6e0e39a6a
+# ╔═╡ e4c89004-0ab5-4d09-af37-df93114d6275
 PlutoUI.Resource("https://tva1.sinaimg.cn/thumbnail/e6c9d24egy1h2alsw1tzxj20m80gomxn.jpg")
 
 
-# ╔═╡ 1c0176b7-931e-499a-9d56-239cfba7e9f2
+# ╔═╡ c79b1816-6ea1-4cb9-909a-a2c811769ef4
 md"""
-# ch03 sec3.1 直线
+# ch05 sec5.5 矩阵的列空间, 行空间, 零空间
 
 !!! outcomes
-
-    - A.求直线的向量, 参数和对称方程
-
-    - B.判断一个点是否在一条给定直线上
-
-    - C.判断两条直线是否相交
-
-    - D.求两条之间之间的夹角
-
-    - E. 求一个点在直线上的投影
+    - A. 求矩阵的列, 行, 零空间的基
+    - B. 求矩阵的秩和零空间维度
 """
 
-# ╔═╡ ad07c025-633f-4ae2-995e-27641764873a
+# ╔═╡ ec376230-d223-48a1-999b-7571d3931336
+md"""
+
+!!! definition
+
+    列空间, 行空间, 零空间
+
+    给定一个$m\times n$ 的矩阵$A$,  $A$ 的列空间记作$col(A)$, 是$A$ 矩阵 列向量张成的空间, 行空间记作$row(A)$, 是$A$ 矩阵 行向量张成的空间, 零空间记作$null(A)$ 是集合:
+    
+    $null(A)=\left \{x |Ax=0\right \}$
+
+
+列空间是$R^m$ 的子空间, 零空间是$R^n$ 空间的子空间, 行空间也可以看做由一组$n$ 维向量生成的子空间. 
+ 
+
+
+
+容易让人疑惑的是当矩阵的行列数一样$n=m$ 时, 行空间和列空间是同一空间的子空间,但是意义不同. 遇到这个问题, 必须实例化,在实际中考虑
+
+
+!!! props
+    行等价
+
+    行变换不会影响行空间
+
+    假定两个矩阵$A,B$ 是行等价矩阵, 则有 $row(A)=row(B), null(A)=null(B)$
+"""
+
+# ╔═╡ 3869e255-38d9-4efd-aa1b-1e9243ccd1b6
 md"""
 !!! example 
-    example 4  经过两点的直线
 
-    给定 $P=(1,2,0,1)$ 和向量$R=(2,-4,6,3)$ 求经过两点的直线方程
-
-
-在两个点中取任意一个点都可以, 然后确定方向向量$d$, 方向向量是两个向量的差
-
-$\vec{d}=\vec{R}-\vec{P}=\begin{bmatrix}2\\ -4\\ 6\\ 3\end{bmatrix}-\begin{bmatrix}1\\2 \\0 \\1 \end{bmatrix}=\begin{bmatrix}1\\-6 \\6 \\2 \end{bmatrix}$
-
-经过两点的直线上点的坐标向量可以表示为:
-
-
-$\begin{bmatrix}x\\y\\ z\\ w\end{bmatrix}=\begin{bmatrix}1\\2 \\0 \\1 \end{bmatrix}+t\begin{bmatrix}1\\-6 \\6 \\2 \end{bmatrix}$
-
-
- $n$ 维空间中经过两点直线上的点的坐标向量表示为:
-
-$$\begin{bmatrix}x_1\\x_2\\\vdots\\ x_n\end{bmatrix}=\begin{bmatrix}p_1\\p_2 \\ \vdots \\p_n\end{bmatrix}+t\begin{bmatrix}d_1\\d_2\\\vdots \\d_n \end{bmatrix}$$
-"""
-
-# ╔═╡ b2a95afc-2f72-46b3-8159-c3b02229bfc7
-md"""
-
-
-!!! defintion
-
-    直线的参数方程
-
-    上述的坐标向量方法, 可以展开为参数方程组成的方程组, 实际我们在所有的描点法绘制图形时,使用的都是这中方法
-
-    $$\begin{bmatrix}x_1\\x_2\\\vdots\\ x_n\end{bmatrix}=\begin{bmatrix}p_1\\p_2 \\ \vdots \\p_n\end{bmatrix}+t\begin{bmatrix}d_1\\d_2\\\vdots \\d_n \end{bmatrix}$$
-
-$x_1=p_1+td_1$
-$x_2=p_2+td_2$
-$$\vdots$$
-$$x_n=p_n+td_n$$
-
-
-!!! example
-
-    example 5   给定 $P=(1,2,0,1)$ 和向量$R=(2,-4,6,3)$ 求经过两点的直线上点的参数方程
-
-
-$\begin{bmatrix}x\\y\\ z\\ w\end{bmatrix}=\begin{bmatrix}1\\2 \\0 \\1 \end{bmatrix}+t\begin{bmatrix}1\\-6 \\6 \\2 \end{bmatrix}$
-
-改写为:
-
-
-
-$$\begin{cases}
- x=1+t \\ 
- y=2-6t  \\ 
- z=6t\\ 
- w=1+2t
-\end{cases}$$
-   
-"""
-
-# ╔═╡ badc2be9-2483-40f5-af0c-6f3b1fa0cbe2
-md"""
-
-!!! example
-    example 6 一个点到直线的最短距离
-
-    假设直线$L$ 通过点$P=(0,4,-2)$,方向向量为$d=[2,1,2]'$, 直线外一点坐标为:$Q=(1,3,5)$ , 求$Q$ 到直线$L$ 的最短距离,以及直线上距离$Q$ 最近的点
-
-![](https://tva1.sinaimg.cn/orj360/e6c9d24egy1h3y3txnc5mj20ia08aaa6.jpg)
-
-
-实际要求 $Q$ 点在 直线上的投影, 首先要知道$\vec{PQ}$,等于头部减去尾部
-
-$\vec{PQ}=\begin{bmatrix}1\\3\\5\end{bmatrix}  -\begin{bmatrix}0\\4\\2\end{bmatrix}=\begin{bmatrix}1\\-1\\ 7\end{bmatrix}$
-
-向量$\vec{PQ}$ 在 直线上的投影表示为:
-
-$\vec{PR}=\frac{d \cdot \vec{PQ} }{||d||^2}d=\frac{5}{3}\begin{bmatrix}2\\1\\ 2\end{bmatrix}$
-
-
-$||RQ||$ 点到直线的距离等于 $||\vec{PQ}-\vec{PR}||$
-
-$||RQ||=||\vec{PQ}-\vec{PR}||=\sqrt{26}$
-
-
-$R$ 点的坐标向量为:
-
-$\begin{bmatrix}0\\4\\2\end{bmatrix}+\frac{5}{3}\begin{bmatrix}2\\1\\ 2\end{bmatrix}$
-
-
-
+    example 1   给定矩阵,求它的列,行, 零空间的基
 
 """
 
-# ╔═╡ 3d73b3bb-1d06-4c71-8930-ecf63eac65f5
+# ╔═╡ 1d870b36-e8c5-4301-949b-43d14179962c
 begin
-        store=Dict()
-    
-        function save(key::String, dict)
-            store[key]=dict
-        end
-        
-        function read(key::String)
-            return  store[key]
-        end
-	
-
-	    function vec_plot(v1,v2,ls=:solid)
-			v11,v12=v1[1],v1[2]
-			v21,v22=v2[1],v2[2]
-			return plot([v11,v21],[v12,v22],label=false, arrow=true, lw=2,ls=ls)
-		end
-
-	    function vec_plot!(v1,v2,ls=:solid)
-			v11,v12=v1[1],v1[2]
-			v21,v22=v2[1],v2[2]
-			return plot!([v11,v21],[v12,v22],label=false, arrow=true, lw=2,ls=ls)
-		end
-
-	    function vec_plot3d(v1,v2,ls=:solid)
-			v11,v12,v13=v1[1],v1[2],v1[3]
-			v21,v22,v23=v2[1],v2[2],v2[3]
-			return plot([v11,v21],[v12,v22],[v13,v23],label=false, lw=1,ls=ls)
-		end
-
-	    function vec_plot3d!(v1,v2,ls=:solid)
-			v11,v12,v13=v1[1],v1[2],v1[3]
-			v21,v22,v23=v2[1],v2[2],v2[3]
-			return plot!([v11,v21],[v12,v22],[v13,v23],label=false, lw=1,ls=ls)
-		end
-
-	    function dist(p,q)
-			length=size(p)
-			arr=[(abs(p[i]-q[i]))^2 for i in 1:length[1]]
-			return sqrt(sum(arr))
-		end
-
-
+	matrix1=[
+	   1 2  1 3 2;
+	   1 3  6 0 2;
+	   3 7  8 6 6 
+	]
+	latexify(matrix1)
 end
 
-# ╔═╡ 605feda5-59f5-428d-a6f0-a30bcf697ecc
+# ╔═╡ e8eafd83-fa11-4780-9ad2-849747ca5176
+begin
+	# 1 列空间是矩阵各列生成的空间, 首先要排除掉冗余的列
+
+	rref_matrix1=rref(matrix1)
+	latexify(rref_matrix1)
+end
+
+# ╔═╡ 371254a9-f869-4185-bbcb-0f284d2a61d2
 md"""
-在前面我们可以从一个点出发, 画出指向另个点的箭头, 第一个点作为尾部, 第二个点作为头部, 这就是向量. 只要方向相同, 或者相反, 我们可以画出无数个向量, 这些向量集合就可以用一条直线来表示 
+可以看到, 第一列和第二列是主元列, 其他列是冗余列. 
+所以矩阵的列的基为第一列和第二列, 列空间为
 
-下面我们画出几个代表
-
- $(store["plotline"])
-
- 给定两个向量, $u,v$, $d$ 表示从$u$ 到 $v$ 的方向.  这个向量是一个相对值, 加上第一个向量就代表向量在坐标系下的坐标.  给$d$ 倍乘任意实数表示沿着这个方向所有的向量, 包括相反方向的.
-
-```julia
-
-  vec1,vec2=[1,1],[2,2]
-
-  d= vec2-vec1
-
-  nvec(k)=vec1+k*d
-```
-
-这里实现的实际是一条仿射直线, 我们在微积分中已经提到过.  从一个点出发, 给定一个方向向量, 在这条直线上的向量坐标都可以用如下公式来表示:
-
-!!!  definition
-
-     $p$ 为空间任意向量, $d$ 也是一个向量,两者结合可以表示一条通过两点的直线:
-
-    $q=p+td$
-
-     $t \in R, d 称为方向向量$
-
-!!! notice
-
-    我们要在坐标系中画出一条直线,仅仅知道方向向量是不够得, 需要知道直线上每个点的坐标向量, 直线上每个点的坐标向量由任一点和方向向量执行加法得到. 
-
-    如图:
-
-   $(store["abline"])
-
-知道了方向向量$\vec{PR}, 坐标向量为: \vec{OP}+\vec{PR}=\vec{OR}$
-
-这个定义不仅仅在 二维和三维空间定义, 在$n$ 维空间同样也成立
-
+$col(A)= \left \{\begin{bmatrix}1\\1\\3\end{bmatrix}, \begin{bmatrix}2\\3 \\7\end{bmatrix} \right \}$
 """
 
-# ╔═╡ adcfdecb-bf60-45ef-9cd1-fcfefd14d03d
-let
-     kspan=-4:0.5:5
-     vec1,vec2=[1,1],[2,2]
-	 d= vec2-vec1
-	 nvec(k)=vec1+k*d
-     plotarr=[]
-     for (i,k) in enumerate(kspan)
-				if i==1
-					p=vec_plot(vec1,vec1+nvec(k))
-					push!(plotarr,p)
-				else
-					p=vec_plot!(vec1,vec1+nvec(k))
-					push!(plotarr,p)
-				end
-	 end
+# ╔═╡ 53712138-c678-4d03-84e2-929a63fd5fca
+md"""
+求矩阵行空间的时候, 可以将矩阵转置, 将行向量转置为列向量进行处理.  但是这一步不必要, 更为简单的办法是, 寻找行化简之后矩阵中的非$0$ 行.  非$0$ 行 对应的行向量就是行空间的基
 
-	 line=plot!(plotarr... ,label=false,frame=:zerolines)
-	 scatter!([vec1[1],vec2[1]],[vec1[2],vec2[2]],ms=4,mc=:red)
-	 save("plotline",line)
+实例中 非$0$ 行 是第1,2 行, 所有对应的行空间的基为
 
+$row(A)=\left \{ \begin{bmatrix}1&0&-9&9&2 \end{bmatrix},\begin{bmatrix}0&1&5&-3&0 \end{bmatrix} \right \}$
+"""
+
+# ╔═╡ bc1d6fe1-010a-4931-920c-880b4d72197c
+md"""
+零空间就是 齐次方程组 $Ax=0$ 的解集
+
+由于我们已近化简得到简化阶梯型, 可以看到第3, 4,5 列都是非主元列, 所有有三个自由变量, 假设主变量为$x,y$  则解集可以表示为:
+
+$\left\{\begin{matrix}
+x=9r-9t-2t\\ 
+y=-5r+3s\\ 
+z=r   \\
+w=s\\
+v=t
+\end{matrix}\right.=r\begin{bmatrix}9\\-5\\1\\0\\0 \end{bmatrix}+s\begin{bmatrix}-9\\3\\0\\1\\0 \end{bmatrix}+t\begin{bmatrix}-2\\0\\0\\0\\1 \end{bmatrix}$
+
+
+
+所以有 :
+
+$null(A)=\left \{\begin{bmatrix}9\\-5\\1\\0\\0 \end{bmatrix},\begin{bmatrix}-9\\3\\0\\1\\0 \end{bmatrix},\begin{bmatrix}-2\\0\\0\\0\\1 \end{bmatrix} \right \}$
+"""
+
+# ╔═╡ 92fc4029-a9d3-43a1-995b-1d8caca4cb02
+md"""
+!!! props
+    列,行, 零空间的维度
+
+    给定一个$m\times n$ 的矩阵 $A$ 结论如下:
+
+    $dim(col(A))=rank(A)$
+
+    $dim(row(A))=rank(A)$
+
+    $dim(null(A))=n-rank(A)$
+
+这里的概念如果需要反复的看才能理解. 请参考书籍相关章节, 反复阅读. 
+"""
+
+# ╔═╡ c667fd1e-df28-45f2-8470-64f7b06ff5ed
+md"""
+零空间有自己的命名称为零化度(nullity). 
+
+$rank(A)+nullity(A)=n$
+
+!!! example 
+
+    example 2  求下面矩阵的秩和零化度
+"""
+
+# ╔═╡ b1c35b56-9def-4fb0-b048-458f0a393148
+begin
+	matrix2=[
+		1 2 1  3 2;
+		1 3 6 0 2;
+		1 2 1 3 2;
+		1 3 2 4 0
+	]
+
+    latexify(matrix2)
 end
 
-# ╔═╡ 290552bf-2b48-4900-9d9d-f0604ef805d8
-let
-     gr()
-     zero,vec1,vec2=[0,0],[1,3],[2,4]
-	 d= vec2-vec1
-	 nvec(k)=vec1+k*d
-     ann=[
-		 (0.5,2,text(L"\vec{OP}",pointsize=13,rotation=30)),
-		 (1.25,3.5,text(L"\vec{PR}",pointsize=13,rotation=10)),
-		 (1,1.5,text(L"\vec{OR}",pointsize=13,rotation=45)),
-		 (1,3.2,text(L"P",pointsize=13,rotation=10)),
-		  (2,4.2,text(L"R",pointsize=13,rotation=10))
-	 ]
-	plot([zero[1],vec2[1],vec1[1],zero[1]],[zero[2],vec2[2],vec1[2],zero[2]],label=false)
-	p1=scatter!([zero[1],vec2[1],vec1[1],zero[1]],[zero[2],vec2[2],vec1[2],zero[2]],label=false,ann=ann,frame=:semi)
-     
-    save("abline",p1)
+# ╔═╡ a9fd8073-91b4-492d-8a71-cf3c1cecd208
+begin
+	rref_matrix2=rref(matrix2)
+	latexify(rref_matrix2)
+	
 end
+
+# ╔═╡ 43a644b8-70e9-49d9-b27c-fdd47a9ef550
+m,n=size(matrix2)  # size 函数获取矩阵的行,列数 n=5
+
+# ╔═╡ 28b62292-b25c-413b-93ae-60f0b5fbf2e7
+md"""
+ 上面矩阵的简化阶梯型有三个主元, 所有$rank(A)=3$
+
+  所以 $nullity$  = $(n-3)
+"""
+
+# ╔═╡ 32e540d0-d05a-49d0-9445-1ce5f3d01f88
+md"""
+
+!!! theorem
+    给定 $m\times n$ 矩阵 $A$,下面的描述等价:
+
+    1.  $rank(A)=n$
+    2.  $row(A)=R^n$
+    3.  $A$ 的列线性无关, 是$R^m$ 空间的一组基
+    4.  $n\times n$ 的$A^TA$ 是可逆矩阵
+    5.  方程组$Ax=0$  只有平凡解
+"""
+
+# ╔═╡ 1d59945b-97bb-4858-8cba-d38f8bb965a8
+md"""
+
+!!! theorem
+    给定 $m\times n$ 矩阵 $A$,下面的描述等价:
+
+    1.  $rank(A)=m$
+    2.  $col(A)=R^m$
+    3.  $A$ 的行是线性无关的
+    4.  $m\times m$ 的$AA^T$ 是可逆矩阵
+    5.  方程组$Ax=b$ 是相容的, 每个$b$ 多有一个解存在
+"""
+
+# ╔═╡ c1d867c6-d740-41e9-8dc1-4b7db7522682
+ @htl("""<script src="https://cdn.bootcdn.net/ajax/libs/mathjax/3.2.0/es5/tex-svg-full.min.js"></script>
+        """)
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
@@ -267,6 +210,7 @@ PLUTO_PROJECT_TOML_CONTENTS = """
 DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
 HypertextLiteral = "ac1192a8-f4b3-4bfe-ba22-af5b92cd3ab2"
 LaTeXStrings = "b964fa9f-0449-5b57-a5c2-d3ea65f4040f"
+Latexify = "23fbe1c1-3f47-55db-b15f-69d7ec21a316"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
 PlutoUI = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
@@ -277,6 +221,7 @@ Symbolics = "0c5d862f-8b57-4792-8d23-62f2024744c7"
 DataFrames = "~1.3.4"
 HypertextLiteral = "~0.9.4"
 LaTeXStrings = "~1.3.0"
+Latexify = "~0.15.15"
 Plots = "~1.31.1"
 PlutoUI = "~0.7.39"
 RowEchelon = "~0.2.1"
@@ -292,9 +237,9 @@ manifest_format = "2.0"
 
 [[deps.AbstractAlgebra]]
 deps = ["GroupsCore", "InteractiveUtils", "LinearAlgebra", "MacroTools", "Markdown", "Random", "RandomExtensions", "SparseArrays", "Test"]
-git-tree-sha1 = "dd2f52bc149ff35158827471453e2e4f1a2685a6"
+git-tree-sha1 = "5d984b08291a3f99891f48007d244221182200cc"
 uuid = "c3fe647b-3220-5bb0-a1ea-a7954cac585d"
-version = "0.26.0"
+version = "0.26.2"
 
 [[deps.AbstractPlutoDingetjes]]
 deps = ["Pkg"]
@@ -537,9 +482,9 @@ uuid = "8ba89e20-285c-5b6f-9357-94700520ee1b"
 
 [[deps.Distributions]]
 deps = ["ChainRulesCore", "DensityInterface", "FillArrays", "LinearAlgebra", "PDMats", "Printf", "QuadGK", "Random", "SparseArrays", "SpecialFunctions", "Statistics", "StatsBase", "StatsFuns", "Test"]
-git-tree-sha1 = "d530092b57aef8b96b27694e51c575b09c7f0b2e"
+git-tree-sha1 = "429077fd74119f5ac495857fd51f4120baf36355"
 uuid = "31c24e10-a181-5473-b8eb-7969acd0382f"
-version = "0.25.64"
+version = "0.25.65"
 
 [[deps.DocStringExtensions]]
 deps = ["LibGit2"]
@@ -664,9 +609,9 @@ version = "0.64.4"
 
 [[deps.GR_jll]]
 deps = ["Artifacts", "Bzip2_jll", "Cairo_jll", "FFMPEG_jll", "Fontconfig_jll", "GLFW_jll", "JLLWrappers", "JpegTurbo_jll", "Libdl", "Libtiff_jll", "Pixman_jll", "Pkg", "Qt5Base_jll", "Zlib_jll", "libpng_jll"]
-git-tree-sha1 = "3a233eeeb2ca45842fe100e0413936834215abf5"
+git-tree-sha1 = "067fecedcecb6a923bc0227bf0a989175ef9565c"
 uuid = "d2c73de3-f751-5644-a686-071e5b155ba9"
-version = "0.64.4+0"
+version = "0.65.1+0"
 
 [[deps.GeometryBasics]]
 deps = ["EarCut_jll", "IterTools", "LinearAlgebra", "StaticArrays", "StructArrays", "Tables"]
@@ -1019,9 +964,9 @@ uuid = "05823500-19ac-5b8b-9628-191a04bc5112"
 
 [[deps.OpenSSL_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
-git-tree-sha1 = "9a36165cf84cff35851809a40a928e1103702013"
+git-tree-sha1 = "e60321e3f2616584ff98f0a4f18d98ae6f89bbb3"
 uuid = "458c3c95-2e84-50aa-8efc-19380b2a3a95"
-version = "1.1.16+0"
+version = "1.1.17+0"
 
 [[deps.OpenSpecFun_jll]]
 deps = ["Artifacts", "CompilerSupportLibraries_jll", "JLLWrappers", "Libdl", "Pkg"]
@@ -1048,9 +993,9 @@ version = "8.44.0+0"
 
 [[deps.PDMats]]
 deps = ["LinearAlgebra", "SparseArrays", "SuiteSparse"]
-git-tree-sha1 = "ca433b9e2f5ca3a0ce6702a032fce95a3b6e1e48"
+git-tree-sha1 = "cf494dca75a69712a72b80bc48f59dcf3dea63ec"
 uuid = "90014a1f-27ba-587c-ab20-58faa44d9150"
-version = "0.11.14"
+version = "0.11.16"
 
 [[deps.Parameters]]
 deps = ["OrderedCollections", "UnPack"]
@@ -1171,9 +1116,9 @@ version = "0.5.2"
 
 [[deps.RecursiveArrayTools]]
 deps = ["Adapt", "ArrayInterfaceCore", "ArrayInterfaceStaticArraysCore", "ChainRulesCore", "DocStringExtensions", "FillArrays", "GPUArraysCore", "LinearAlgebra", "RecipesBase", "StaticArraysCore", "Statistics", "ZygoteRules"]
-git-tree-sha1 = "7ddd4f1ac52f9cc1b784212785f86a75602a7e4b"
+git-tree-sha1 = "7a5f08bdeb79cf3f8ce60125fe1b2a04041c1d26"
 uuid = "731186ca-8d62-57ce-b412-fbd966d074cd"
-version = "2.31.0"
+version = "2.31.1"
 
 [[deps.Reexport]]
 git-tree-sha1 = "45e428421666073eab6f2da5c9d310d99bb12f9b"
@@ -1332,9 +1277,9 @@ uuid = "4607b0f0-06f3-5cda-b6b1-a6196a1729e9"
 
 [[deps.SymbolicUtils]]
 deps = ["AbstractTrees", "Bijections", "ChainRulesCore", "Combinatorics", "ConstructionBase", "DataStructures", "DocStringExtensions", "DynamicPolynomials", "IfElse", "LabelledArrays", "LinearAlgebra", "Metatheory", "MultivariatePolynomials", "NaNMath", "Setfield", "SparseArrays", "SpecialFunctions", "StaticArrays", "TermInterface", "TimerOutputs"]
-git-tree-sha1 = "92b21f756625f2ff3b2a05495c105f432be01e17"
+git-tree-sha1 = "027b43d312f6d52187bb16c2d4f0588ddb8c4bb2"
 uuid = "d1185830-fcd6-423d-90d6-eec64667417b"
-version = "0.19.10"
+version = "0.19.11"
 
 [[deps.Symbolics]]
 deps = ["ArrayInterfaceCore", "ConstructionBase", "DataStructures", "DiffRules", "Distributions", "DocStringExtensions", "DomainSets", "Groebner", "IfElse", "Latexify", "Libdl", "LinearAlgebra", "MacroTools", "Metatheory", "NaNMath", "RecipesBase", "Reexport", "Requires", "RuntimeGeneratedFunctions", "SciMLBase", "Setfield", "SparseArrays", "SpecialFunctions", "StaticArrays", "SymbolicUtils", "TermInterface", "TreeViews"]
@@ -1656,15 +1601,24 @@ version = "0.9.1+5"
 """
 
 # ╔═╡ Cell order:
-# ╟─5fff0cf2-6d56-4ee0-ac45-f6c6e0e39a6a
-# ╟─e2024006-fcfd-11ec-1b29-41546d0924f1
-# ╟─1c0176b7-931e-499a-9d56-239cfba7e9f2
-# ╠═605feda5-59f5-428d-a6f0-a30bcf697ecc
-# ╠═adcfdecb-bf60-45ef-9cd1-fcfefd14d03d
-# ╠═290552bf-2b48-4900-9d9d-f0604ef805d8
-# ╠═ad07c025-633f-4ae2-995e-27641764873a
-# ╠═b2a95afc-2f72-46b3-8159-c3b02229bfc7
-# ╠═badc2be9-2483-40f5-af0c-6f3b1fa0cbe2
-# ╠═3d73b3bb-1d06-4c71-8930-ecf63eac65f5
+# ╟─e4c89004-0ab5-4d09-af37-df93114d6275
+# ╟─10c6f24a-00b1-11ed-3cf1-4bb5e31575e1
+# ╠═c79b1816-6ea1-4cb9-909a-a2c811769ef4
+# ╠═ec376230-d223-48a1-999b-7571d3931336
+# ╠═3869e255-38d9-4efd-aa1b-1e9243ccd1b6
+# ╠═1d870b36-e8c5-4301-949b-43d14179962c
+# ╠═e8eafd83-fa11-4780-9ad2-849747ca5176
+# ╠═371254a9-f869-4185-bbcb-0f284d2a61d2
+# ╠═53712138-c678-4d03-84e2-929a63fd5fca
+# ╠═bc1d6fe1-010a-4931-920c-880b4d72197c
+# ╠═92fc4029-a9d3-43a1-995b-1d8caca4cb02
+# ╠═c667fd1e-df28-45f2-8470-64f7b06ff5ed
+# ╠═b1c35b56-9def-4fb0-b048-458f0a393148
+# ╠═a9fd8073-91b4-492d-8a71-cf3c1cecd208
+# ╠═43a644b8-70e9-49d9-b27c-fdd47a9ef550
+# ╠═28b62292-b25c-413b-93ae-60f0b5fbf2e7
+# ╠═32e540d0-d05a-49d0-9445-1ce5f3d01f88
+# ╠═1d59945b-97bb-4858-8cba-d38f8bb965a8
+# ╟─c1d867c6-d740-41e9-8dc1-4b7db7522682
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
